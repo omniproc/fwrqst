@@ -1,0 +1,98 @@
+[build-system]
+requires = [
+  "pip                    == 26.0.1",
+  "build                  == 1.4.2",
+  "pytest                 == 9.0.2",
+  "wheel                  == 0.46.3",
+  "setuptools             == 82.0.1",
+  "setuptools_scm[toml]   == 10.0.5",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fwrqst"
+dynamic = ['version']
+description = "Lib for interacting with the Tufin API"
+readme = "README.md"
+requires-python = "~=3.14"
+keywords = ["python", "firewall", "tufin"]
+license = { file = "LICENSE" }
+authors = [{ name = "Robert Ruf", email = "fwrqst.hvgh7@silomails.com" }]
+
+dependencies = [
+  "pyyaml             == 6.0.3",  # YAML parser
+  "httpx              == 0.28.1", # HTTP client
+  "pydantic           == 2.12.5", # Data validation and management
+  "dynaconf           == 3.2.13", # Settings management
+  "platformdirs       == 4.9.4",  # Cross-platform directories
+]
+
+[project.optional-dependencies]
+cli = [
+  "typer[standard]    == 0.24.0", # CLI framework
+]
+dev = [
+  "flake8             ~= 7.3.0",   # Code linting, PEP8 and type errors
+  "flake8-pyproject   ~= 1.2.4",   # Flake8 plugin for pyproject.toml
+  "bandit             ~= 1.9.4",   # Code linting: security best pra
+  "black              ~= 26.3.1",  # Formatting rules, auto-apply PEP8
+]
+test = [
+  "pytest             == 9.0.2",   # Unittests
+  "pytest-cov         == 7.1.0",   # Coverage
+  "pytest-mock        == 3.15.1",  # Mocking
+  "pytest-httpx       == 0.36.0",  # HTTPX mocking
+  "hypothesis         == 6.151.10", # Property-based testing
+]
+all = ["fwrqst[cli,dev,test]"]
+
+[project.urls]
+git = "https://github.com/omniproc/fwrqst/"
+
+[project.scripts]
+fwrqst = "fwrqst.cli.main:start"
+
+[tool.pytest.ini_options]
+addopts = "-ra --cov=fwrqst --cov-report=term-missing --junitxml=junit.xml" # Add -q for less verbose output
+testpaths = ["tests"]
+
+[tool.setuptools]
+platforms = ["any"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+fwrqst = ["*.schema.json"]
+
+[tool.setuptools_scm]
+# setuptools_scm is used to dynamically set the version number based on GIT metadata
+version_scheme = "python-simplified-semver"
+# Omit the local part of the version number (pypi doesn't support local versions)
+local_scheme = "no-local-version"
+
+[tool.bandit]
+exclude_dirs = [".venv", ".vscode", "build", "dist", "examples", "debug"]
+# See https://bandit.readthedocs.io/en/latest/plugins/index.html
+skips = ["B201", "B601", "B610", "B611"]
+
+[tool.bandit.assert_used]
+# Skipp assert warnings for test files
+skips = ['*_test.py', '*/test_*.py']
+
+[tool.black]
+line-length = 127
+
+[tool.flake8]
+# See https://flake8.pycqa.org/en/latest/user/violations.html
+# See https://flake8.pycqa.org/en/latest/user/error-codes.html
+# See https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes
+select = ["F", "E", "W"]
+ignore = [
+  "F405", # name may be undefined, or defined from star imports: module
+  "F403", # 'from module import *' used; unable to detect undefined names
+  "E501", # line too long
+]
+per-file-ignores = ['__init__.py:F401']
+max-line-length = 127
+exclude = [".venv", ".vscode", "build", "dist", "examples"]
+count = true
+statistics = true

@@ -1,0 +1,6 @@
+{
+    "name": "FwRqst",
+    "dockerComposeFile": "docker-compose.yaml",
+    "service": "devenv",
+    "workspaceFolder": "/workspace"
+}

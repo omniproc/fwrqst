@@ -1,0 +1,8 @@
+version: "3"
+services:
+  devenv:
+    container_name: fwrqst
+    image: mcr.microsoft.com/devcontainers/python:3.14
+    volumes:
+      - ..:/workspace
+    command: sleep infinity
