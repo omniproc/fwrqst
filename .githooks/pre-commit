@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Resolve venv bin directory (Windows Git Bash: Scripts, POSIX: bin)
+if [ -d ".venv/Scripts" ]; then
+    venv_bin=".venv/Scripts"
+elif [ -d ".venv/bin" ]; then
+    venv_bin=".venv/bin"
+else
+    printf 'ERROR: Virtual environment not found. Run "make install" first.\n' >&2
+    exit 1
+fi
+
+python="${venv_bin}/python"
+
+if [ ! -f "${python}" ] && [ ! -f "${python}.exe" ]; then
+    printf 'ERROR: Python not found at %s. Run "make install" first.\n' "${python}" >&2
+    exit 1
+fi
+
+printf '==> black --check .\n'
+"${python}" -m black --check .
+
+printf '==> flake8 .\n'
+"${python}" -m flake8 .
+
+printf '==> mypy src/\n'
+"${python}" -m mypy src/

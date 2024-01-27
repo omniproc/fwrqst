@@ -1,0 +1,96 @@
+{
+  "v": 2,
+  "name": "securechange",
+  "folders": [
+    {
+      "v": 2,
+      "name": "tickets",
+      "folders": [],
+      "requests": [
+        {
+          "v": "1",
+          "endpoint": "https://{{fqdn}}:{{port}}/securechangeworkflow/api/securechange/tickets/{{ticket_id}}",
+          "name": "get",
+          "params": [],
+          "headers": [
+            {
+              "active": true,
+              "key": "type",
+              "value": "ACCESS_REQUEST"
+            },
+            {
+              "active": true,
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "active": true,
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "GET",
+          "auth": {
+            "authType": "basic",
+            "authActive": true,
+            "username": "{{username}}",
+            "password": "{{password}}"
+          },
+          "preRequestScript": "",
+          "testScript": "",
+          "body": {
+            "contentType": null,
+            "body": null
+          }
+        },
+        {
+          "v": "1",
+          "endpoint": "https://{{fqdn}}:{{port}}/securechangeworkflow/api/securechange/tickets",
+          "name": "post",
+          "params": [],
+          "headers": [
+            {
+              "active": true,
+              "key": "type",
+              "value": "ACCESS_REQUEST"
+            },
+            {
+              "active": true,
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "active": true,
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "auth": {
+            "authType": "basic",
+            "authActive": true,
+            "username": "{{username}}",
+            "password": "{{password}}"
+          },
+          "preRequestScript": "",
+          "testScript": "",
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"ticket\": {\n    \"subject\": \"{{ticket_subject}}\",\n    \"priority\": \"{{ticket_priority}}\",\n    \"expiration_date\": \"{{ticket_expiration_date}}\",\n    \"workflow\": {\n      \"name\": \"{{ticket_workflow_name}}\"\n    },\n    \"steps\": {\n      \"step\": [\n        {\n          \"tasks\": {\n            \"task\": {\n              \"fields\": {\n                \"field\": [\n                  {\n                    \"@xsi.type\": \"multi_access_request\",\n                    \"access_request\": [\n                      {\n                        \"source_domain\": \"{{ticket_source_domain}}\",\n                        \"destination_domain\": \"{{ticket_destination_domain}}\",\n                        \"sources\": {\n                          \"source\": [\n                            {\n                              \"@type\": \"IP\",\n                              \"ip_address\": \"{{ticket_source_address}}\",\n                              \"cidr\": \"{{ticket_source_cidr}}\"\n                            },\n                            {\n                              \"@type\": \"Object\",\n                              \"object_name\": \"{{ticket_source_object_name}}\",\n                              \"management_name\": \"{{ticket_source_management_name}}\"\n                            }\n                          ]\n                        },\n                        \"destinations\": {\n                          \"destination\": [\n                            {\n                              \"@type\": \"DNS\",\n                              \"host_name\": \"{{ticket_destination_host_name}}\"\n                            }\n                          ]\n                        },\n                        \"services\": {\n                          \"service\": [\n                            {\n                              \"@type\": \"PROTOCOL\",\n                              \"protocol\": \"TCP\",\n                              \"port\": \"{{ticket_service_port}}\"\n                            }\n                          ]\n                        },\n                        \"action\": \"{{ticket_action}}\",\n                        \"comment\": \"{{ticket_comment}}\"\n                      },\n                      {\n                        \"source_domain\": \"{{ticket_source_domain}}\",\n                        \"destination_domain\": \"{{ticket_destination_domain}}\",\n                        \"sources\": {\n                          \"source\": [\n                            {\n                              \"@type\": \"IP\",\n                              \"ip_address\": \"{{ticket_source_address}}\",\n                              \"cidr\": \"{{ticket_source_cidr}}\"\n                            },\n                            {\n                              \"@type\": \"Object\",\n                              \"object_name\": \"{{ticket_source_object_name}}\",\n                              \"management_name\": \"{{ticket_source_management_name}}\"\n                            }\n                          ]\n                        },\n                        \"destinations\": {\n                          \"destination\": [\n                            {\n                              \"@type\": \"DNS\",\n                              \"host_name\": \"{{ticket_destination_host_name}}\"\n                            }\n                          ]\n                        },\n                        \"services\": {\n                          \"service\": [\n                            {\n                              \"@type\": \"PROTOCOL\",\n                              \"protocol\": \"TCP\",\n                              \"port\": \"{{ticket_service_port}}\"\n                            }\n                          ]\n                        },\n                        \"action\": \"{{ticket_action}}\",\n                        \"comment\": \"{{ticket_comment}}\"\n                      }\n                    ]\n                  }\n                ]\n              }\n            }\n          }\n        }\n      ]\n    }\n  }\n}"
+          }
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": []
+    }
+  ],
+  "requests": [],
+  "auth": {
+    "authType": "inherit",
+    "authActive": false
+  },
+  "headers": []
+}
