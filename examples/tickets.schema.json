@@ -1,0 +1,380 @@
+{
+  "$defs": {
+    "AccessRequest": {
+      "description": "A Tufin access request",
+      "properties": {
+        "comment": {
+          "default": "",
+          "description": "A meaningful comment for this access request",
+          "title": "Comment",
+          "type": "string"
+        },
+        "action": {
+          "$ref": "#/$defs/Action",
+          "default": "accept",
+          "description": "The action to perform when a connection matches the defined rule"
+        },
+        "source_domain": {
+          "default": "Default",
+          "description": "The Tufin domain of the source endpoint",
+          "minLength": 1,
+          "title": "Source Domain",
+          "type": "string"
+        },
+        "sources": {
+          "description": "list of source endpoints to allow",
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "DNS": "#/$defs/DnsEndpoint",
+                "IP": "#/$defs/IpEndpoint",
+                "Object": "#/$defs/ObjectEndpoint",
+                "RANGE": "#/$defs/IPRangeEndpoint"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/IpEndpoint"
+              },
+              {
+                "$ref": "#/$defs/IPRangeEndpoint"
+              },
+              {
+                "$ref": "#/$defs/DnsEndpoint"
+              },
+              {
+                "$ref": "#/$defs/ObjectEndpoint"
+              }
+            ]
+          },
+          "minItems": 1,
+          "title": "Sources",
+          "type": "array"
+        },
+        "destination_domain": {
+          "default": "Default",
+          "description": "The Tufin domain of the destination endpoint",
+          "minLength": 1,
+          "title": "Destination Domain",
+          "type": "string"
+        },
+        "destinations": {
+          "description": "list of destination endpoints to allow",
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "DNS": "#/$defs/DnsEndpoint",
+                "IP": "#/$defs/IpEndpoint",
+                "Object": "#/$defs/ObjectEndpoint",
+                "RANGE": "#/$defs/IPRangeEndpoint"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/IpEndpoint"
+              },
+              {
+                "$ref": "#/$defs/IPRangeEndpoint"
+              },
+              {
+                "$ref": "#/$defs/DnsEndpoint"
+              },
+              {
+                "$ref": "#/$defs/ObjectEndpoint"
+              }
+            ]
+          },
+          "minItems": 1,
+          "title": "Destinations",
+          "type": "array"
+        },
+        "services": {
+          "description": "list of services to allow",
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "TCP": "#/$defs/TcpService",
+                "UDP": "#/$defs/UdpService"
+              },
+              "propertyName": "protocol"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/TcpService"
+              },
+              {
+                "$ref": "#/$defs/UdpService"
+              }
+            ]
+          },
+          "minItems": 1,
+          "title": "Services",
+          "type": "array"
+        }
+      },
+      "required": [
+        "sources",
+        "destinations",
+        "services"
+      ],
+      "title": "Access Request",
+      "type": "object"
+    },
+    "AccessRequestTicket": {
+      "description": "A Tufin access request ticket, wrapping one or more Tufin access request",
+      "properties": {
+        "subject": {
+          "default": "FwRqst",
+          "description": "Subject of this Tufin access request ticket",
+          "minLength": 1,
+          "title": "Subject",
+          "type": "string"
+        },
+        "workflow": {
+          "default": "Standard",
+          "description": "Name of the Tufin workflow to use",
+          "minLength": 1,
+          "title": "Workflow",
+          "type": "string"
+        },
+        "priority": {
+          "$ref": "#/$defs/Priority",
+          "default": "Normal",
+          "description": "Priority of this Tufin access request ticket"
+        },
+        "expiration": {
+          "description": "Date when the changes requested in this ticket expire in ISO 8601 format",
+          "format": "date",
+          "title": "Expiration",
+          "type": "string"
+        },
+        "access_requests": {
+          "description": "list of access requests",
+          "items": {
+            "$ref": "#/$defs/AccessRequest"
+          },
+          "minItems": 1,
+          "title": "Access Requests",
+          "type": "array"
+        }
+      },
+      "required": [
+        "access_requests"
+      ],
+      "title": "Access Request Ticket",
+      "type": "object"
+    },
+    "Action": {
+      "description": "A Tufin access request action",
+      "enum": [
+        "accept",
+        "drop",
+        "remove"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "DnsEndpoint": {
+      "description": "A DNS network endpoint",
+      "properties": {
+        "kind": {
+          "const": "DNS",
+          "description": "DNS endpoint",
+          "title": "Kind",
+          "type": "string"
+        },
+        "fqdn": {
+          "description": "Valid DNS Fully Qualified Domain Name as specified by RFC5890 section 2.3.2.3",
+          "title": "Fqdn",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fqdn",
+        "kind"
+      ],
+      "title": "DNS Name",
+      "type": "object"
+    },
+    "IPRangeEndpoint": {
+      "description": "An IP network range endpoint",
+      "properties": {
+        "kind": {
+          "const": "RANGE",
+          "description": "IP range endpoint",
+          "title": "Kind",
+          "type": "string"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "format": "ipv4",
+              "type": "string"
+            },
+            {
+              "format": "ipv6",
+              "type": "string"
+            }
+          ],
+          "description": "The start IP address of this endpoint",
+          "title": "Start"
+        },
+        "end": {
+          "anyOf": [
+            {
+              "format": "ipv4",
+              "type": "string"
+            },
+            {
+              "format": "ipv6",
+              "type": "string"
+            }
+          ],
+          "description": "The end IP address of this endpoint",
+          "title": "End"
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "kind"
+      ],
+      "title": "IP Range",
+      "type": "object"
+    },
+    "IpEndpoint": {
+      "description": "An IP address network endpoint",
+      "properties": {
+        "kind": {
+          "const": "IP",
+          "description": "IP address endpoint",
+          "title": "Kind",
+          "type": "string"
+        },
+        "address": {
+          "anyOf": [
+            {
+              "format": "ipv4",
+              "type": "string"
+            },
+            {
+              "format": "ipv6",
+              "type": "string"
+            }
+          ],
+          "description": "The IP address of this endpoint",
+          "title": "Address"
+        },
+        "cidr": {
+          "description": "The CIDR of this endpoint",
+          "maximum": 128,
+          "minimum": 0,
+          "title": "Cidr",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "address",
+        "cidr",
+        "kind"
+      ],
+      "title": "IP Address",
+      "type": "object"
+    },
+    "ObjectEndpoint": {
+      "description": "A pre-defined Tufin object endpoint",
+      "properties": {
+        "kind": {
+          "const": "Object",
+          "description": "Object endpoint",
+          "title": "Kind",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the Tufin object",
+          "title": "Name",
+          "type": "string"
+        },
+        "manager": {
+          "description": "The Tufin management name in charge of the Tufin object",
+          "title": "Manager",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "manager",
+        "kind"
+      ],
+      "title": "Tufin Object",
+      "type": "object"
+    },
+    "Priority": {
+      "description": "A Tufin ticket priority",
+      "enum": [
+        "Low",
+        "Normal",
+        "High",
+        "Critical"
+      ],
+      "title": "Priority",
+      "type": "string"
+    },
+    "TcpService": {
+      "description": "TCP network service",
+      "properties": {
+        "protocol": {
+          "const": "TCP",
+          "description": "TCP protocol type",
+          "title": "Protocol",
+          "type": "string"
+        },
+        "port": {
+          "description": "The port of this service",
+          "maximum": 65535,
+          "minimum": 0,
+          "title": "Port",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "port",
+        "protocol"
+      ],
+      "title": "TCP network service",
+      "type": "object"
+    },
+    "UdpService": {
+      "description": "UDP network service",
+      "properties": {
+        "protocol": {
+          "const": "UDP",
+          "description": "UDP protocol type",
+          "title": "Protocol",
+          "type": "string"
+        },
+        "port": {
+          "description": "The port of this service",
+          "maximum": 65535,
+          "minimum": 0,
+          "title": "Port",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "port",
+        "protocol"
+      ],
+      "title": "UDP network service",
+      "type": "object"
+    }
+  },
+  "description": "A collection of Tufin access request tickets",
+  "items": {
+    "$ref": "#/$defs/AccessRequestTicket"
+  },
+  "title": "Access Request Tickets",
+  "type": "array"
+}

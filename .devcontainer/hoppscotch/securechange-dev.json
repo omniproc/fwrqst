@@ -1,0 +1,81 @@
+{
+  "name": "securechange-dev",
+  "variables": [
+    {
+      "key": "fqdn",
+      "value": "localhost"
+    },
+    {
+      "key": "port",
+      "value": "8080"
+    },
+    {
+      "key": "username",
+      "value": "dummy"
+    },
+    {
+      "key": "password",
+      "value": "pass"
+    },
+    {
+      "key": "ticket_id",
+      "value": "999999"
+    },
+    {
+      "key": "ticket_subject",
+      "value": "API Test"
+    },
+    {
+      "key": "ticket_priority",
+      "value": "Normal"
+    },
+    {
+      "key": "ticket_expiration_date",
+      "value": "2025-01-01"
+    },
+    {
+      "key": "ticket_workflow_name",
+      "value": "access-request-workflow"
+    },
+    {
+      "key": "ticket_source_domain",
+      "value": "Default"
+    },
+    {
+      "key": "ticket_destination_domain",
+      "value": "Default"
+    },
+    {
+      "key": "ticket_source_address",
+      "value": "127.0.0.1"
+    },
+    {
+      "key": "ticket_source_cidr",
+      "value": "32"
+    },
+    {
+      "key": "ticket_source_object_name",
+      "value": "test-object"
+    },
+    {
+      "key": "ticket_source_management_name",
+      "value": "test-mgr"
+    },
+    {
+      "key": "ticket_destination_host_name",
+      "value": "localhost"
+    },
+    {
+      "key": "ticket_service_port",
+      "value": "443"
+    },
+    {
+      "key": "ticket_comment",
+      "value": "test comment"
+    },
+    {
+      "key": "ticket_action",
+      "value": "Accept"
+    }
+  ]
+}

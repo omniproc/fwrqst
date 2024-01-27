@@ -1,0 +1,78 @@
+# Rename this file to publish.yml to enable PyPI publishing.
+# Triggered automatically when release-please creates a GitHub Release.
+#
+# Prerequisites:
+#   1. Configure PyPI trusted publishing (pypi.org → Publishing → Add pending publisher)
+#   2. Create a "pypi" environment in GitHub repo settings (Settings → Environments)
+
+name: Publish to PyPI
+run-name: Publishing ${{ github.event.release.tag_name }}
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  # Gate: re-run tests to ensure the tagged commit is healthy
+  verify:
+    runs-on: ubuntu-24.04
+    env:
+      PIP_ROOT_USER_ACTION: ignore
+      PIP_DISABLE_PIP_VERSION_CHECK: 1
+      PYTHONDONTWRITEBYTECODE: 1
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0  # Required for setuptools_scm to derive version from tag
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: "pip"
+      - run: pip install --upgrade pip
+      - run: pip install .[all]
+      - name: Verify package version matches release tag
+        run: |
+          PKG_VERSION=$(python -c "from importlib.metadata import version; print(version('fwrqst'))")
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          echo "Package version: $PKG_VERSION"
+          echo "Tag version:     $TAG_VERSION"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Version mismatch! Package=$PKG_VERSION Tag=$TAG_VERSION"
+            exit 1
+          fi
+      - name: Run tests
+        run: pytest
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-24.04
+    environment: pypi
+    permissions:
+      id-token: write  # Required for OIDC trusted publishing
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0  # Required for setuptools_scm to derive version from tag
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - name: Install build tools
+        run: pip install build
+      - name: Build package
+        run: python -m build
+      - name: Verify built version matches tag
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          ls dist/
+          # Use a glob instead of ls|grep (shellcheck SC2010)
+          shopt -s nullglob
+          files=(dist/fwrqst-"${TAG_VERSION}"*)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::Built artifact version does not match tag ${TAG_VERSION}"
+            exit 1
+          fi
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=./tickets.schema.json
+- access_requests:
+  - action: accept
+    comment: 'Rule #1'
+    destination_domain: Default
+    destinations:
+    - fqdn: example.com
+      kind: DNS
+    services:
+    - port: 80
+      protocol: TCP
+    source_domain: Default
+    sources:
+    - address: 127.0.0.1
+      cidr: 32
+      kind: IP
+  expiration: '2026-12-31'
+  priority: Normal
+  subject: API Test
+  workflow: some-workflow-name

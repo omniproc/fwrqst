@@ -1,0 +1,28 @@
+{
+  "workbench.startupEditor": "none",
+  "git.autofetch": true,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+
+  "isort.args": ["--profile", "black"],
+  "bandit.args": ["-c pyproject.toml"],
+  "yaml.schemas": {},
+  "python.testing.pytestArgs": ["tests"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "python.analysis.extraPaths": ["src"],
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "flake8.args": [
+    "--ignore=W501,F403,F405",
+    "--max-line-length=127",
+    "--per-file-ignores='__init__.py:F401'"
+  ]
+}
