@@ -11,7 +11,6 @@ by the ``@cli.callback`` and forwarded to every child command via the
 Typer context object.
 """
 
-
 # __IMPORTS______________________________________________________________________________________________________________
 from contextlib import contextmanager
 from pathlib import Path

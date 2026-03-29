@@ -7,7 +7,6 @@
 FwRst 🔥 - A small tool to ease big pain
 """
 
-
 # __IMPORTS______________________________________________________________________________________________________________
 from importlib.metadata import PackageNotFoundError, version
 

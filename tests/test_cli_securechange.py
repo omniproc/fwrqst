@@ -270,8 +270,7 @@ def test_securechange_create_http_error(mock_svc_cls, tmp_path):
 
     _expiration = (date.today() + timedelta(days=30)).isoformat()
     input_file = tmp_path / "request.yaml"
-    input_file.write_text(
-        f"""
+    input_file.write_text(f"""
 - subject: Test
   workflow: Standard
   priority: Normal
@@ -291,8 +290,7 @@ def test_securechange_create_http_error(mock_svc_cls, tmp_path):
       services:
         - protocol: TCP
           port: 443
-"""
-    )
+""")
 
     result = runner.invoke(cli, [*_SHARED_ARGS, "create", str(input_file)])
     assert result.exit_code == EXIT_FAILURE
@@ -309,8 +307,7 @@ def test_securechange_create_request_error(mock_svc_cls, tmp_path):
 
     _expiration = (date.today() + timedelta(days=30)).isoformat()
     input_file = tmp_path / "request.yaml"
-    input_file.write_text(
-        f"""
+    input_file.write_text(f"""
 - subject: Test
   workflow: Standard
   priority: Normal
@@ -330,8 +327,7 @@ def test_securechange_create_request_error(mock_svc_cls, tmp_path):
       services:
         - protocol: TCP
           port: 443
-"""
-    )
+""")
 
     result = runner.invoke(cli, [*_SHARED_ARGS, "create", str(input_file)])
     assert result.exit_code == EXIT_FAILURE
