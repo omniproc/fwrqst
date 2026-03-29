@@ -71,3 +71,15 @@ jobs:
           flags: test-results
       - name: Build package using PEP 517/518
         run: python -m build
+
+  check:
+    if: always()
+    needs: [build]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Verify all builds passed
+        run: |
+          if [[ "${{ needs.build.result }}" != "success" ]]; then
+            echo "Build failed or was cancelled"
+            exit 1
+          fi
