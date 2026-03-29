@@ -29,7 +29,7 @@ dependencies = [
 
 [project.optional-dependencies]
 cli = [
-  "typer              == 0.24.0", # CLI framework
+  "typer              == 0.24.1", # CLI framework
 ]
 dev = [
   "flake8             ~= 7.3.0",   # Code linting, PEP8 and type errors
