@@ -221,13 +221,10 @@ pytest                        # Tests
 
 The workspace includes debug launch configurations (`.vscode/launch.json`):
 
-| Configuration           | Description                         |
-| ----------------------- | ----------------------------------- |
-| **Debug**               | Run `debug/debug.py`                |
-| **Debug: Current File** | Run the currently open file         |
-| **Debug: CLI (fwrqst)** | Debug the CLI entry point           |
-| **Debug: Pytest**       | Debug tests with breakpoint support |
-| **Debug: Mypy**         | Debug mypy type checking            |
+| Configuration     | Description                         |
+| ----------------- | ----------------------------------- |
+| **Debug: CLI**    | Debug the CLI entry point           |
+| **Debug: Pytest** | Debug tests with breakpoint support |
 
 Recommended extensions are listed in `.vscode/extensions.json` and will be suggested on first open.
 

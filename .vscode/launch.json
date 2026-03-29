@@ -5,26 +5,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${workspaceFolder}/debug/debug.py",
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "justMyCode": false,
-      "envFile": "${workspaceFolder}/.env"
-    },
-    {
-      "name": "Debug: Current File",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${file}",
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "justMyCode": false,
-      "envFile": "${workspaceFolder}/.env"
-    },
-    {
       "name": "Debug: CLI (fwrqst)",
       "type": "debugpy",
       "request": "launch",
@@ -45,16 +25,6 @@
       "console": "integratedTerminal",
       "justMyCode": false,
       "envFile": "${workspaceFolder}/.env"
-    },
-    {
-      "name": "Debug: Mypy",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "mypy",
-      "args": ["src/"],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "justMyCode": false
     }
   ]
 }
