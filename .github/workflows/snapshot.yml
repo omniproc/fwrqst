@@ -4,6 +4,8 @@ run-name: ${{ github.actor }} triggered a new build
 on: 
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,9 +28,9 @@ jobs:
         python-version: ["3.14"]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip' # caching pip dependencies
@@ -60,9 +62,11 @@ jobs:
         run: pytest
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: junit.xml
+          flags: test-results
       - name: Build package using PEP 517/518
         run: python -m build
       
