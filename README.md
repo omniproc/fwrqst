@@ -1,6 +1,6 @@
 # fwrqst
 
-![Build](https://github.com/omniproc/fwrqst/actions/workflows/snapshot.yml/badge.svg)
+![CI](https://github.com/omniproc/fwrqst/actions/workflows/ci.yml/badge.svg)
 ![Release](https://github.com/omniproc/fwrqst/actions/workflows/release.yml/badge.svg)
 ![Codecov](https://codecov.io/gh/omniproc/fwrqst/branch/main/graph/badge.svg)
 ![Python](https://img.shields.io/badge/python-~%3D3.14-blue?logo=python&logoColor=white)
