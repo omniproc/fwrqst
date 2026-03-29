@@ -5,12 +5,16 @@ on:
   push:
     branches: [ "main" ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       PIP_ROOT_USER_ACTION: ignore
       PIP_DISABLE_PIP_VERSION_CHECK: 1
@@ -19,7 +23,7 @@ jobs:
       PYTHONUNBUFFERED: 1
     strategy:
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.14"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,11 +37,11 @@ jobs:
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
       - name: Install dependencies
-        run: pip install .[all]
+        run: pip install .[all] build
       - name: Format with black
         run: |
           # Settings are configured within pyproject.toml [tool.black]
-          black .
+          black --check .
       - name: Lint with flake8
         run: |
           # Settings are configured within pyproject.toml [tool.flake8]
@@ -47,20 +51,18 @@ jobs:
           # Critical pycodestyle errors (E)
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # Only report all other syntax issues. The GitHub editor is 127 chars wide
-          flake8 . --count --select=F,E,W --exit-zero --max-complexity=10 --statistics
-        continue-on-error: true
+          flake8 . --count --select=F,E,W --max-complexity=10 --statistics
       - name: Test source security
         run: |
           # Settings are configured within pyproject.toml [tool.bandit]
           bandit -c pyproject.toml -r .
       - name: Run unit tests
-        run: pytest .
+        run: pytest
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-      - name: Build Wheels using PEP 517/518
-        # when using --no-deps all dependencies have to be already available
-        run: pip wheel --no-deps --wheel-dir dist .
+      - name: Build package using PEP 517/518
+        run: python -m build
       
