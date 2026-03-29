@@ -50,6 +50,7 @@ all = ["fwrqst[cli,dev,test]"]
 
 [project.urls]
 git = "https://github.com/omniproc/fwrqst/"
+pypi = "https://pypi.org/project/fwrqst/"
 
 [project.scripts]
 fwrqst = "fwrqst.cli.main:start"

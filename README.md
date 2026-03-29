@@ -4,6 +4,7 @@
 ![Release](https://github.com/omniproc/fwrqst/actions/workflows/release.yml/badge.svg)
 ![Codecov](https://codecov.io/gh/omniproc/fwrqst/branch/main/graph/badge.svg)
 ![Python](https://img.shields.io/badge/python-~%3D3.14-blue?logo=python&logoColor=white)
+![PyPI](https://img.shields.io/pypi/v/fwrqst?logo=pypi&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Conventional Commits](https://img.shields.io/badge/commits-conventional-fe5196?logo=conventionalcommits&logoColor=white)
 
