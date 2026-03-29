@@ -60,7 +60,7 @@ class TcpService(Service, title="TCP network service", use_enum_values=True, jso
 
     protocol: Annotated[
         Literal[ProtocolType.TCP], Field(description="TCP protocol type", json_schema_extra=_strip_default_from_schema)
-    ] = ProtocolType.TCP.value
+    ] = ProtocolType.TCP
     port: int = Field(description="The port of this service", ge=0, le=65535)
 
 
@@ -71,7 +71,7 @@ class UdpService(Service, title="UDP network service", use_enum_values=True, jso
 
     protocol: Annotated[
         Literal[ProtocolType.UDP], Field(description="UDP protocol type", json_schema_extra=_strip_default_from_schema)
-    ] = ProtocolType.UDP.value
+    ] = ProtocolType.UDP
     port: int = Field(description="The port of this service", ge=0, le=65535)
 
 
@@ -90,7 +90,7 @@ class IpEndpoint(Endpoint, title="IP Address", use_enum_values=True, json_schema
 
     kind: Annotated[
         Literal[EndpointType.IP], Field(description="IP address endpoint", json_schema_extra=_strip_default_from_schema)
-    ] = EndpointType.IP.value
+    ] = EndpointType.IP
     address: IPv4Address | IPv6Address = Field(description="The IP address of this endpoint")
     cidr: int = Field(description="The CIDR of this endpoint", ge=0, le=128)
 
@@ -102,7 +102,7 @@ class IPRangeEndpoint(Endpoint, title="IP Range", use_enum_values=True, json_sch
 
     kind: Annotated[
         Literal[EndpointType.RANGE], Field(description="IP range endpoint", json_schema_extra=_strip_default_from_schema)
-    ] = EndpointType.RANGE.value
+    ] = EndpointType.RANGE
     start: IPv4Address | IPv6Address = Field(description="The start IP address of this endpoint")
     end: IPv4Address | IPv6Address = Field(description="The end IP address of this endpoint")
 
@@ -114,7 +114,7 @@ class DnsEndpoint(Endpoint, title="DNS Name", use_enum_values=True, json_schema_
 
     kind: Annotated[
         Literal[EndpointType.DNS], Field(description="DNS endpoint", json_schema_extra=_strip_default_from_schema)
-    ] = EndpointType.DNS.value
+    ] = EndpointType.DNS
     fqdn: str = Field(description="Valid DNS Fully Qualified Domain Name as specified by RFC5890 section 2.3.2.3")
 
 
@@ -125,7 +125,7 @@ class ObjectEndpoint(Endpoint, title="Tufin Object", use_enum_values=True, json_
 
     kind: Annotated[
         Literal[EndpointType.OBJECT], Field(description="Object endpoint", json_schema_extra=_strip_default_from_schema)
-    ] = EndpointType.OBJECT.value
+    ] = EndpointType.OBJECT
     name: str = Field(description="The name of the Tufin object")
     manager: str = Field(description="The Tufin management name in charge of the Tufin object")
 
@@ -225,7 +225,7 @@ class AccessRequestTicket(BaseModel, title="Access Request Ticket", use_enum_val
 
         if not self.expiration:  # pragma: no cover
             self._expiration = _max_expiration
-            return
+            return self
         if self.expiration > _max_expiration:
             raise ValueError(f"Maximum allowed expiration date is {_max_expiration.isoformat()}")  # pragma: no cover
         if self.expiration < _min_expiration:

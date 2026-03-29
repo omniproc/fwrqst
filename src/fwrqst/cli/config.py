@@ -61,7 +61,7 @@ class UnionParser(ParamType):
     _BOOL_TRUE = "true"
     _BOOL_FALSE = "false"
 
-    def convert(self, value, param, ctx) -> str | int | bool:
+    def convert(self, value, param, ctx) -> str | int | bool | None:
         if not value:
             # No value given — return None so the setting resets to its default.
             return None
@@ -120,7 +120,7 @@ def set(
     key: Annotated[
         str,
         typer.Option("--key", "-k", help="Setting to configure."),
-    ] = None,
+    ] = None,  # type: ignore[assignment]
     value: Annotated[
         Union,
         typer.Option(
@@ -129,7 +129,7 @@ def set(
             help="Value of the setting. Empty sets default.",
             click_type=UnionParser(),
         ),
-    ] = None,
+    ] = None,  # type: ignore[assignment]
 ):
     """
     Set and persist a setting to disk.

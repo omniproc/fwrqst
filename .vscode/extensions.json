@@ -11,6 +11,7 @@
         "nwgh.bandit", 
         "tamasfe.even-better-toml", 
         "ms-python.flake8", 
+        "ms-python.mypy-type-checker",
         "christian-kohler.path-intellisense",
         "esbenp.prettier-vscode",
         "adamhartford.vscode-base64"

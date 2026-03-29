@@ -19,6 +19,23 @@ from fwrqst.models.adapter import (
     EndpointAdapter,
     ServiceAdapter,
 )
+from fwrqst.models.tufin_dto import (
+    AccessRequestDto,
+    AccessRequestFieldDto,
+    AccessRequestTicketDto,
+    DestinationsDto,
+    FieldsDto,
+    IpEndpointDto,
+    ServicesDto,
+    SourcesDto,
+    StepDto,
+    StepsDto,
+    TaskDto,
+    TasksDto,
+    TCPProtocolServiceDto,
+    TicketRootDto,
+    WorkflowDto,
+)
 
 
 # __PROGRAM____________________________________________________________________________________________________________
@@ -86,3 +103,31 @@ def test_service_roundtrip(service):
     result = ServiceAdapter.from_dto(dto)
     assert result.protocol == service.protocol
     assert result.port == service.port
+
+
+def test_from_dto_with_task_list():
+    """from_dto should handle TasksDto.task as a list (API response format)."""
+    from datetime import date, timedelta
+
+    expiration = date.today() + timedelta(days=30)
+    ar_dto = AccessRequestDto(
+        sources=SourcesDto(source=[IpEndpointDto(address="10.0.0.1", cidr=32)]),
+        destinations=DestinationsDto(destination=[IpEndpointDto(address="10.0.0.2", cidr=32)]),
+        services=ServicesDto(service=[TCPProtocolServiceDto(port=443)]),
+        source_domain="Default",
+        destination_domain="Default",
+        action="accept",
+    )
+    task = TaskDto(fields=FieldsDto(field=[AccessRequestFieldDto(access_request=[ar_dto])]))
+    ticket_dto = TicketRootDto(
+        ticket=AccessRequestTicketDto(
+            subject="Test",
+            priority="Normal",
+            expiration=expiration,
+            workflow=WorkflowDto(name="Standard"),
+            steps=StepsDto(step=[StepDto(tasks=TasksDto(task=[task]))]),
+        )
+    )
+    result = AccessRequestTicketAdapter.from_dto(data=ticket_dto)
+    assert result.subject == "Test"
+    assert len(result.access_requests) == 1

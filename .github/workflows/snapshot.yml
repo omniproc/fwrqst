@@ -54,6 +54,8 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # Only report all other syntax issues. The GitHub editor is 127 chars wide
           flake8 . --count --select=F,E,W --max-complexity=10 --statistics
+      - name: Type check with mypy
+        run: mypy src/
       - name: Test source security
         run: |
           # Settings are configured within pyproject.toml [tool.bandit]
@@ -69,4 +71,11 @@ jobs:
           flags: test-results
       - name: Build package using PEP 517/518
         run: python -m build
+      # - name: Upload build artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: dist-${{ github.sha }}
+      #     path: dist/
+      #     retention-days: 30
+      #     if-no-files-found: error
       

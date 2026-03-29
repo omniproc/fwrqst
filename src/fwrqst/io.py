@@ -44,7 +44,8 @@ def read_yaml(path: Path) -> dict:
     Read a YAML file and return its contents as a dict.
     """
     with open(path, "r") as file:
-        return yaml.safe_load(file)
+        data: dict = yaml.safe_load(file)
+    return data
 
 
 def write_yaml(path: Path, data: dict) -> None:
@@ -55,7 +56,7 @@ def write_yaml(path: Path, data: dict) -> None:
         yaml.dump(data, file)
 
 
-def export_schema(path: Path = None) -> None | dict:
+def export_schema(path: Path | None = None) -> None | dict:
     """
     Returns the JSON schema of access request tickets.
     If a path is provided, saves the schema to the file.
@@ -69,3 +70,4 @@ def export_schema(path: Path = None) -> None | dict:
     path = path.with_suffix(".json")
     with open(path, "w") as file:
         file.write(json.dumps(adapter.json_schema(), indent=2))
+    return None

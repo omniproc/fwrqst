@@ -31,8 +31,8 @@ class Proxy:
         Proxy: A proxy settings object
     """
 
-    http: str = None
-    https: str = None
+    http: str | None = None
+    https: str | None = None
 
 
 class ApiClient(Client):

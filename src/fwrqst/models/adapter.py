@@ -13,15 +13,15 @@ tickets from the Tufin API and when posting new tickets.
 """
 
 # __IMPORTS______________________________________________________________________________________________________________
+import ipaddress
+
 from fwrqst.models.ticket import (
     AccessRequest,
     AccessRequestTicket,
     DnsEndpoint,
-    Endpoint,
     IpEndpoint,
     IPRangeEndpoint,
     ObjectEndpoint,
-    Service,
     TcpService,
     UdpService,
 )
@@ -36,7 +36,6 @@ from fwrqst.models.tufin_dto import (
     IpEndpointDto,
     IpRangeEndpointDto,
     ObjectEndpointDto,
-    ServiceDto,
     ServicesDto,
     SourcesDto,
     StepDto,
@@ -48,7 +47,6 @@ from fwrqst.models.tufin_dto import (
     UDPProtocolServiceDto,
     WorkflowDto,
 )
-from fwrqst.models.types import EndpointType, ProtocolType, ServiceType
 
 
 # __PROGRAM______________________________________________________________________________________________________________
@@ -56,13 +54,13 @@ class EndpointAdapter:
     """Convert between domain Endpoint models and Tufin EndpointDto objects."""
 
     @classmethod
-    def from_dto(cls, data: EndpointDto) -> Endpoint:
+    def from_dto(cls, data: EndpointDto) -> IpEndpoint | IPRangeEndpoint | DnsEndpoint | ObjectEndpoint:
         """Map a Tufin endpoint DTO to the corresponding domain model."""
         match data:
             case IpEndpointDto(address=address, cidr=cidr):
-                return IpEndpoint(address=address, cidr=cidr)
+                return IpEndpoint(address=ipaddress.ip_address(address), cidr=cidr)
             case IpRangeEndpointDto(start=start, end=end):
-                return IPRangeEndpoint(start=start, end=end)
+                return IPRangeEndpoint(start=ipaddress.ip_address(start), end=ipaddress.ip_address(end))
             case DnsEndpointDto(fqdn=fqdn):
                 return DnsEndpoint(fqdn=fqdn)
             case ObjectEndpointDto(name=name, manager=manager):
@@ -71,54 +69,41 @@ class EndpointAdapter:
                 raise ValueError(f"Invalid endpoint type: {data}")
 
     @classmethod
-    def to_dto(cls, data: Endpoint) -> EndpointDto:
+    def to_dto(
+        cls, data: IpEndpoint | IPRangeEndpoint | DnsEndpoint | ObjectEndpoint
+    ) -> IpEndpointDto | IpRangeEndpointDto | DnsEndpointDto | ObjectEndpointDto:
         """Map a domain endpoint model to the corresponding Tufin DTO."""
-        endpoint = None
-        if data.kind == EndpointType.IP:
-            endpoint = IpEndpointDto(address=str(data.address), cidr=str(data.cidr))
-        elif data.kind == EndpointType.RANGE:
-            endpoint = IpRangeEndpointDto(start=str(data.start), end=str(data.end))
-        elif data.kind == EndpointType.DNS:
-            endpoint = DnsEndpointDto(fqdn=data.fqdn)
-        elif data.kind == EndpointType.OBJECT:
-            endpoint = ObjectEndpointDto(name=data.name, manager=data.manager)
-        else:  # pragma: no cover
-            raise ValueError(f"Invalid endpoint kind: {data.kind}")
-
-        return endpoint
+        if isinstance(data, IpEndpoint):
+            return IpEndpointDto(address=str(data.address), cidr=data.cidr)
+        elif isinstance(data, IPRangeEndpoint):
+            return IpRangeEndpointDto(start=str(data.start), end=str(data.end))
+        elif isinstance(data, DnsEndpoint):
+            return DnsEndpointDto(fqdn=data.fqdn)
+        elif isinstance(data, ObjectEndpoint):
+            return ObjectEndpointDto(name=data.name, manager=data.manager)
+        raise ValueError(f"Invalid endpoint kind: {data.kind}")  # pragma: no cover
 
 
 class ServiceAdapter:
     """Convert between domain Service models and Tufin ServiceDto objects."""
 
     @classmethod
-    def from_dto(cls, data: ServiceDto) -> Service:
+    def from_dto(cls, data: TCPProtocolServiceDto | UDPProtocolServiceDto) -> TcpService | UdpService:
         """Map a Tufin service DTO to the corresponding domain model."""
-        match data.kind:
-            case ServiceType.PROTOCOL:
-                match data.protocol:
-                    case ProtocolType.TCP:
-                        return TcpService(port=data.port)
-                    case ProtocolType.UDP:
-                        return UdpService(port=data.port)
-                    case _:  # pragma: no cover
-                        raise ValueError(f"Invalid protocol type: {data.protocol}")
-            case ServiceType.PREDEFINED:  # pragma: no cover
-                raise NotImplementedError()
-            case _:  # pragma: no cover
-                raise ValueError(f"Invalid service type: {data.kind}")
+        if isinstance(data, TCPProtocolServiceDto):
+            return TcpService(port=data.port)
+        elif isinstance(data, UDPProtocolServiceDto):
+            return UdpService(port=data.port)
+        raise ValueError(f"Invalid service type: {data.kind}")  # pragma: no cover
 
     @classmethod
-    def to_dto(cls, data: Service) -> ServiceDto:
+    def to_dto(cls, data: TcpService | UdpService) -> TCPProtocolServiceDto | UDPProtocolServiceDto:
         """Map a domain service model to the corresponding Tufin DTO."""
-        service = None
-        if data.protocol == ProtocolType.TCP:
-            service = TCPProtocolServiceDto(port=data.port)
-        elif data.protocol == ProtocolType.UDP:
-            service = UDPProtocolServiceDto(port=data.port)
-        else:  # pragma: no cover
-            raise ValueError(f"Invalid service kind: {data.kind}")
-        return service
+        if isinstance(data, TcpService):
+            return TCPProtocolServiceDto(port=data.port)
+        elif isinstance(data, UdpService):
+            return UDPProtocolServiceDto(port=data.port)
+        raise ValueError(f"Invalid service protocol: {data.protocol}")  # pragma: no cover
 
 
 class AccessRequestTicketAdapter:
@@ -130,7 +115,10 @@ class AccessRequestTicketAdapter:
         ticket = data.ticket
 
         try:
-            access_requests_dto = ticket.steps.step[0].tasks.task.fields.field[0].access_request
+            task = ticket.steps.step[0].tasks.task
+            if isinstance(task, list):
+                task = task[0]
+            access_requests_dto = task.fields.field[0].access_request
         except AttributeError, IndexError:  # pragma: no cover
             access_requests_dto = []
 

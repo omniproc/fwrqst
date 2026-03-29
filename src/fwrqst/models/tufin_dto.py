@@ -39,22 +39,22 @@ class ServiceDto(BaseModel, populate_by_name=True, use_enum_values=True):
 
 
 class ProtocolServiceDto(ServiceDto, populate_by_name=True, use_enum_values=True):
-    kind: Annotated[Literal[ServiceType.PROTOCOL], Field(alias="@type")] = ServiceType.PROTOCOL.value
+    kind: Annotated[Literal[ServiceType.PROTOCOL], Field(alias="@type")] = ServiceType.PROTOCOL
     protocol: Annotated[str, Field()]
 
 
 class PredefinedServiceDto(ServiceDto, populate_by_name=True, use_enum_values=True):
-    kind: Annotated[Literal[ServiceType.PREDEFINED], Field(alias="@type")] = ServiceType.PREDEFINED.value
+    kind: Annotated[Literal[ServiceType.PREDEFINED], Field(alias="@type")] = ServiceType.PREDEFINED
 
 
 class TCPProtocolServiceDto(ProtocolServiceDto, populate_by_name=True, use_enum_values=True):
     port: int
-    protocol: Annotated[Literal[ProtocolType.TCP], Field()] = ProtocolType.TCP.value
+    protocol: Annotated[Literal[ProtocolType.TCP], Field()] = ProtocolType.TCP
 
 
 class UDPProtocolServiceDto(ProtocolServiceDto, populate_by_name=True, use_enum_values=True):
     port: int
-    protocol: Annotated[Literal[ProtocolType.UDP], Field()] = ProtocolType.UDP.value
+    protocol: Annotated[Literal[ProtocolType.UDP], Field()] = ProtocolType.UDP
 
 
 class ServicesDto(BaseModel, populate_by_name=True, use_enum_values=True):
@@ -66,13 +66,13 @@ class EndpointDto(BaseModel, populate_by_name=True, use_enum_values=True):
 
 
 class IpEndpointDto(EndpointDto, populate_by_name=True, use_enum_values=True):
-    kind: Annotated[Literal[EndpointType.IP], Field(alias="@type")] = EndpointType.IP.value
+    kind: Annotated[Literal[EndpointType.IP], Field(alias="@type")] = EndpointType.IP
     address: Annotated[str, Field(alias="ip_address")]
     cidr: Annotated[int, Field(default=32)]
 
 
 class IpRangeEndpointDto(EndpointDto, populate_by_name=True, use_enum_values=True):
-    kind: Annotated[Literal[EndpointType.RANGE], Field(alias="@type")] = EndpointType.RANGE.value
+    kind: Annotated[Literal[EndpointType.RANGE], Field(alias="@type")] = EndpointType.RANGE
     start: Annotated[str, Field(alias="range_first_ip")]
     end: Annotated[str, Field(alias="range_last_ip")]
 
@@ -83,19 +83,19 @@ class IpRangeEndpointDto(EndpointDto, populate_by_name=True, use_enum_values=Tru
         first_ip = self.start
         last_ip = self.end
 
-        if ipaddress.ip_address(first_ip) >= ipaddress.ip_address(last_ip):
+        if ipaddress.ip_address(first_ip) >= ipaddress.ip_address(last_ip):  # type: ignore[operator]
             raise ValueError(f"First IP '{first_ip}' >= last IP '{last_ip}'")  # pragma: no cover
 
         return self
 
 
 class DnsEndpointDto(EndpointDto, populate_by_name=True, use_enum_values=True):
-    kind: Annotated[Literal[EndpointType.DNS], Field(alias="@type")] = EndpointType.DNS.value
+    kind: Annotated[Literal[EndpointType.DNS], Field(alias="@type")] = EndpointType.DNS
     fqdn: Annotated[str, Field(alias="host_name")]
 
 
 class ObjectEndpointDto(EndpointDto, populate_by_name=True, use_enum_values=True):
-    kind: Annotated[Literal[EndpointType.OBJECT], Field(alias="@type")] = EndpointType.OBJECT.value
+    kind: Annotated[Literal[EndpointType.OBJECT], Field(alias="@type")] = EndpointType.OBJECT
     name: Annotated[str, Field(alias="object_name")]
     manager: Annotated[str, Field(alias="management_name")]
 
@@ -127,9 +127,7 @@ class FieldDto(BaseModel, populate_by_name=True, use_enum_values=True):
 
 
 class AccessRequestFieldDto(FieldDto, populate_by_name=True, use_enum_values=True):
-    kind: Annotated[Literal[RequestType.MULTI_ACCESS_REQUEST], Field(alias="@xsi.type")] = (
-        RequestType.MULTI_ACCESS_REQUEST.value
-    )
+    kind: Annotated[Literal[RequestType.MULTI_ACCESS_REQUEST], Field(alias="@xsi.type")] = RequestType.MULTI_ACCESS_REQUEST
 
     access_request: Annotated[list[AccessRequestDto], Field()]
 

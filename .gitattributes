@@ -1,0 +1,9 @@
+# Auto-detect text files and normalise line endings on commit
+* text=auto
+
+# Force LF line endings for shell scripts (required by bash)
+*.sh      text eol=lf
+.githooks/* text eol=lf
+
+# Force LF for Makefile (GNU Make is LF-safe, avoids mixed endings)
+Makefile  text eol=lf

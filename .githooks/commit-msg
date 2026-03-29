@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Validate conventional commit format.
+# Allowed types: feat, fix, perf, refactor, docs, test, ci, chore, build, style
+
+commit_msg_file="${1:?Usage: commit-msg <msg-file>}"
+commit_msg="$(head -n 1 "${commit_msg_file}")"
+
+pattern='^(feat|fix|perf|refactor|docs|test|ci|chore|build|style)(\(.+\))?(!)?: .+'
+
+if [[ ! "${commit_msg}" =~ ${pattern} ]]; then
+    printf 'ERROR: Commit message does not follow Conventional Commits.\n\n' >&2
+    printf '  Expected: <type>[optional scope]: <description>\n' >&2
+    printf '  Allowed types: feat, fix, perf, refactor, docs, test, ci, chore, build, style\n\n' >&2
+    printf '  Got: %s\n' "${commit_msg}" >&2
+    exit 1
+fi

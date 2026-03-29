@@ -31,7 +31,7 @@ def accessrequest(
     output: Annotated[
         Path,
         typer.Option("--output", "-o", help="Path to an output file.", file_okay=True, dir_okay=False, writable=True),
-    ] = None,
+    ] = None,  # type: ignore[assignment]
 ):
     """
     Get the Tufin SecureChange access request schema.

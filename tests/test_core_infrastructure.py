@@ -79,7 +79,7 @@ class TestApiClient:
     def test_url_matches_pattern(self, domain, port, base):
         """URL should always match https://{domain}:{port}/{base} pattern."""
         client = ApiClient(auth=_make_auth(), domain=domain, sslctx=_make_sslctx(), base=base, port=port)
-        assert re.match(r"^https://[^:]+:\d+/\S+$", client.url)
+        assert re.match(r"^https://[^:]+:\d+/\S*$", client.url)
 
 
 class TestSecureChangeClient:

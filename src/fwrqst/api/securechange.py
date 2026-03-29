@@ -39,7 +39,7 @@ _REQUEST_TYPE_ACCESS_REQUEST = "ACCESS_REQUEST"
 
 
 # __PROGRAM______________________________________________________________________________________________________________
-def _create_sslctx(cafile: Path | str = None) -> ssl.SSLContext:
+def _create_sslctx(cafile: Path | str | None = None) -> ssl.SSLContext:
     """Create a hardened SSL context for Tufin API connections.
 
     Enables hostname verification, requires peer certificates, and
@@ -66,9 +66,9 @@ class SecureChangeClient(ApiClient):
         self,
         auth: BasicAuth,
         sslctx: ssl.SSLContext,
-        domain: str = SETTINGS.get(KEY_SECURE_CHANGE_DOMAIN, None),
+        domain: str | None = SETTINGS.get(KEY_SECURE_CHANGE_DOMAIN, None),
         base: str = SETTINGS.get(KEY_SECURE_CHANGE_API_BASE_PATH, None),
-        port: int = SETTINGS.get(KEY_SECURE_CHANGE_PORT, None),
+        port: int | None = SETTINGS.get(KEY_SECURE_CHANGE_PORT, None),
         proxy: Proxy = ApiClient._PROXY,
         **kwargs,
     ):
@@ -78,7 +78,13 @@ class SecureChangeClient(ApiClient):
             raise ValueError("No port provided.")
         if not base and not SETTINGS.get(KEY_SECURE_CHANGE_API_BASE_PATH, None):
             raise ValueError("No api base path provided.")
-        super().__init__(domain=domain, auth=auth, base=base, port=port, sslctx=sslctx, proxy=proxy, **kwargs)
+
+        # Fall back to settings if not provided directly
+        resolved_domain = domain or SETTINGS.get(KEY_SECURE_CHANGE_DOMAIN)
+        resolved_port: int = port or SETTINGS.get(KEY_SECURE_CHANGE_PORT)
+        super().__init__(
+            domain=resolved_domain, auth=auth, base=base, port=resolved_port, sslctx=sslctx, proxy=proxy, **kwargs
+        )
 
     def get_ticket(self, path: str, **kwargs):
         """Send a GET request to the given *path* appended to the base URL."""
@@ -111,7 +117,13 @@ class AccessRequestService:
     }
 
     def __init__(
-        self, username: str, password: str, domain: str = None, port: int = None, cafile: Path | str = None, **kwargs
+        self,
+        username: str,
+        password: str,
+        domain: str | None = None,
+        port: int | None = None,
+        cafile: Path | str | None = None,
+        **kwargs,
     ):
         sslctx = _create_sslctx(cafile=cafile)
 
@@ -131,8 +143,8 @@ class AccessRequestService:
         """Submit a new access request ticket.  Returns the server-assigned ticket ID."""
         ticket_dto = AccessRequestTicketAdapter.to_dto(data=ticket)
         response = self.client.post_ticket(_TICKETS_ENDPOINT, data=ticket_dto.model_dump(mode="json", by_alias=True))
-        return response.json()[_TICKET_RESPONSE_ID_KEY]
+        return str(response.json()[_TICKET_RESPONSE_ID_KEY])
 
     def cancel_ticket(self, ticket_id: str) -> None:
         """Cancel a pending access request by *ticket_id*."""
-        return self.client.put_ticket(f"{_TICKETS_ENDPOINT}/{ticket_id}{_TICKET_CANCEL_SUFFIX}")
+        self.client.put_ticket(f"{_TICKETS_ENDPOINT}/{ticket_id}{_TICKET_CANCEL_SUFFIX}")

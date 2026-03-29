@@ -14,6 +14,7 @@ SETTINGS.get() call across the codebase references a single source of truth.
 
 # __IMPORTS______________________________________________________________________________________________________________
 from pathlib import Path
+from types import UnionType
 from typing import Any
 
 from dynaconf import Dynaconf, ValidationError, Validator, loaders
@@ -96,7 +97,7 @@ def validate() -> None:
     SETTINGS.validators.validate()
 
 
-def update(key: str, value: str, save: bool = False) -> None:
+def update(key: str, value: Any, save: bool = False) -> None:
     """Update a single setting by *key*.
 
     The new *value* is validated immediately (``validate_on_update=True``).
@@ -126,7 +127,8 @@ def update(key: str, value: str, save: bool = False) -> None:
 def read() -> list[tuple[str, Any]]:
     """Return all settings as ``(key, value)`` pairs after validation."""
     validate()
-    return SETTINGS.as_dict().items()
+    items: list[tuple[str, Any]] = list(SETTINGS.as_dict().items())
+    return items
 
 
 def file_path_exists(value: str | None) -> bool:
@@ -144,7 +146,7 @@ def file_path_exists(value: str | None) -> bool:
     return True
 
 
-def _typed_validator(name: str, expected_type: type, default, **constraint_kwargs) -> list[Validator]:
+def _typed_validator(name: str, expected_type: type | UnionType, default, **constraint_kwargs) -> list[Validator]:
     """Create a pair of Dynaconf validators for a single setting.
 
     Returns two ``Validator`` instances:

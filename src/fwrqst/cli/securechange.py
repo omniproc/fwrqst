@@ -159,19 +159,21 @@ def securechange_callback(
     # Each call to update() also triggers Dynaconf validation.
     if domain:
         cli_context[_CTX_DOMAIN] = domain
-        update(key=KEY_SECURE_CHANGE_DOMAIN, value=domain)
+        update(key=KEY_SECURE_CHANGE_DOMAIN, value=str(domain))
     if port:
         cli_context[_CTX_PORT] = port
         update(key=KEY_SECURE_CHANGE_PORT, value=port)
     if cafile:
         cli_context[_CTX_CAFILE] = cafile
-        update(key=KEY_SECURE_CHANGE_CA_FILE, value=cafile)
+        update(key=KEY_SECURE_CHANGE_CA_FILE, value=str(cafile))
     if workflow:
         cli_context[_CTX_WORKFLOW] = workflow
         update(key=KEY_ACCESS_REQUEST_WORKFLOW, value=workflow)
 
     # Initialise the service shared by all child commands.
     try:
+        if not username or not password:
+            raise ValueError("Username and password are required.")
         service = AccessRequestService(username=username, password=password, domain=domain, port=port, cafile=cafile)
         cli_context[_CTX_SERVICE] = service
     except Exception as ex:
@@ -211,7 +213,7 @@ def read(
     output: Annotated[
         Optional[Path],
         typer.Option(help="Path to an output file.", file_okay=True, dir_okay=False, writable=True),
-    ] = "",
+    ] = None,
 ):
     """Read an existing Tufin access request."""
     with _handle_api_errors("read Tufin access request"):

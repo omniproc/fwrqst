@@ -1,6 +1,11 @@
 # fwrqst
 
-![snapshot workflow](https://github.com/omniproc/fwrqst/actions/workflows/snapshot.yml/badge.svg)
+![Build](https://github.com/omniproc/fwrqst/actions/workflows/snapshot.yml/badge.svg)
+![Release](https://github.com/omniproc/fwrqst/actions/workflows/release.yml/badge.svg)
+![Codecov](https://codecov.io/gh/omniproc/fwrqst/branch/main/graph/badge.svg)
+![Python](https://img.shields.io/badge/python-~%3D3.14-blue?logo=python&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Conventional Commits](https://img.shields.io/badge/commits-conventional-fe5196?logo=conventionalcommits&logoColor=white)
 
 A library abstracting the complexity of creating firewall configuration change requests against [tufin](https://www.tufin.com/de/tufin-orchestration-suite/securechange).
 
@@ -152,34 +157,100 @@ Few things to note here:
 
 # Development
 
-## Environment
+## Prerequisites
 
-Get an isolated build environment
+- Python 3.14+
+- `make` (optional but recommended — on Windows: `winget install GnuWin32.Make` or use Git Bash / WSL)
+
+## Quick start
 
 ```bash
-pip install virtualenv
-python -m virtualenv .venv
+# Install all dependencies and git hooks (auto-creates the venv)
+make install
+```
+
+All make targets automatically create the virtual environment if it does not exist yet.
+
+## Available Make targets
+
+| Target           | Description                                      |
+| ---------------- | ------------------------------------------------ |
+| `make help`      | Show all available targets                       |
+| `make venv`      | Create a `.venv` virtual environment             |
+| `make activate`  | Print venv activation instructions               |
+| `make install`   | Install all dependencies and git hooks           |
+| `make format`    | Auto-format code with black                      |
+| `make lint`      | Lint code with flake8                            |
+| `make typecheck` | Type-check code with mypy                        |
+| `make security`  | Security scan with bandit                        |
+| `make test`      | Run unit tests with coverage                     |
+| `make build`     | Build sdist and wheel                            |
+| `make check`     | Run all checks (lint, typecheck, security, test) |
+| `make clean`     | Remove generated files                           |
+
+## Manual setup (without Make)
+
+```bash
+python -m venv .venv
+
+# Activate the venv
+# Linux / macOS:
 source .venv/bin/activate
-pip install -e .[dev,cli,test]
+# Windows (PowerShell):
+.venv\Scripts\Activate.ps1
+
+# Install dependencies
+pip install --upgrade pip
+pip install -e ".[all]" build
+
+# Install git hooks
+git config core.hooksPath .githooks
 ```
 
-When done, run basic project specific checks with project defaults defined in `pyproject.toml`.
+## Running checks locally
 
 ```bash
-black .
-bandit -c pyproject.toml -r .
-flake8 .
+black .                       # Format
+flake8 .                      # Lint
+mypy src/                     # Type check
+bandit -c pyproject.toml -r . # Security
+pytest                        # Tests
 ```
 
-And run unit tests with defaults defined in `pyproject.toml`.
+## VS Code
 
-```bash
-pytest .
+The workspace includes debug launch configurations (`.vscode/launch.json`):
+
+| Configuration           | Description                         |
+| ----------------------- | ----------------------------------- |
+| **Debug**               | Run `debug/debug.py`                |
+| **Debug: Current File** | Run the currently open file         |
+| **Debug: CLI (fwrqst)** | Debug the CLI entry point           |
+| **Debug: Pytest**       | Debug tests with breakpoint support |
+| **Debug: Mypy**         | Debug mypy type checking            |
+
+Recommended extensions are listed in `.vscode/extensions.json` and will be suggested on first open.
+
+## Commit convention
+
+This project uses [Conventional Commits](https://www.conventionalcommits.org/). Git hooks enforce the format automatically. Allowed prefixes: `feat`, `fix`, `perf`, `refactor`, `docs`, `test`, `ci`, `chore`, `build`, `style`.
+
+Examples:
+
 ```
+feat: add bulk ticket creation
+fix: handle empty YAML input gracefully
+docs: update CLI usage examples
+```
+
+[release-please](https://github.com/googleapis/release-please) uses these commits to auto-generate the changelog and determine version bumps.
 
 ## Building
 
-`pip wheel --no-deps --wheel-dir dist .`. Follow the build steps from the CI pipelines for more details.
+```bash
+make build
+# or: python -m build
+```
 
 # Tufin API documentation
 

@@ -179,6 +179,29 @@ def test_securechange_create_ticket(mock_svc_cls, tmp_path):
     mock_svc.create_ticket.assert_called_once()
 
 
+def test_securechange_missing_username_and_password():
+    """Missing username and password should fail."""
+    result = runner.invoke(
+        cli,
+        [
+            "securechange",
+            "-u",
+            "",
+            "-p",
+            "",
+            "-d",
+            _VALID_DOMAIN,
+            "--port",
+            _VALID_PORT,
+            "--workflow",
+            _VALID_WORKFLOW,
+            "read",
+            "123",
+        ],
+    )
+    assert result.exit_code != EXIT_SUCCESS
+
+
 @patch("fwrqst.cli.securechange.AccessRequestService")
 def test_securechange_create_invalid_file(mock_svc_cls, tmp_path):
     """Create command should fail gracefully with invalid YAML content."""
