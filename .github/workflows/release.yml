@@ -29,4 +29,6 @@ jobs:
         id: release
         with:
           release-type: simple
+          bump-minor-pre-major: true
+          bump-patch-for-minor-pre-major: true
           token: ${{ steps.app-token.outputs.token }}
