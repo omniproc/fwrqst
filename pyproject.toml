@@ -44,7 +44,7 @@ test = [
   "pytest-cov         == 7.1.0",   # Coverage
   "pytest-mock        == 3.15.1",  # Mocking
   "pytest-httpx       == 0.36.0",  # HTTPX mocking
-  "hypothesis         == 6.151.10", # Property-based testing
+  "hypothesis         == 6.151.11", # Property-based testing
 ]
 all = ["fwrqst[cli,dev,test]"]
 
