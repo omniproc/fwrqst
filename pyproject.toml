@@ -2,7 +2,7 @@
 requires = [
   "pip                    == 26.0.1",
   "build                  == 1.4.2",
-  "pytest                 == 9.0.2",
+  "pytest                 == 9.0.3",
   "wheel                  == 0.46.3",
   "setuptools             == 82.0.1",
   "setuptools_scm[toml]   == 10.0.5",
@@ -40,11 +40,11 @@ dev = [
   "types-PyYAML       ~= 6.0",        # Type stubs for PyYAML
 ]
 test = [
-  "pytest             == 9.0.2",   # Unittests
+  "pytest             == 9.0.3",   # Unittests
   "pytest-cov         == 7.1.0",   # Coverage
   "pytest-mock        == 3.15.1",  # Mocking
-  "pytest-httpx       == 0.36.0",  # HTTPX mocking
-  "hypothesis         == 6.151.11", # Property-based testing
+  "pytest-httpx       == 0.36.2",  # HTTPX mocking
+  "hypothesis         == 6.151.12", # Property-based testing
 ]
 all = ["fwrqst[cli,dev,test]"]
 
