@@ -64,7 +64,7 @@ jobs:
         run: pytest
       - name: Upload test results to Codecov
         if: ${{ !cancelled() && github.event_name != 'pull_request' }}
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: junit.xml
