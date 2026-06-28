@@ -71,6 +71,10 @@ fwrqst = ["*.schema.json"]
 version_scheme = "python-simplified-semver"
 # Omit the local part of the version number (pypi doesn't support local versions)
 local_scheme = "no-local-version"
+# Fallback used when neither git metadata nor PKG-INFO from an sdist is available
+# (e.g. shallow CI checkouts, GitHub source tarballs). Keeps `python -m build`'s
+# wheel-from-sdist step working even when setuptools_scm cannot detect a version.
+fallback_version = "0.0.0"
 
 [tool.bandit]
 exclude_dirs = [".venv", ".vscode", "build", "dist", "examples", "debug"]
