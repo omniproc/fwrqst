@@ -35,7 +35,7 @@ dev = [
   "flake8             ~= 7.3.0",   # Code linting, PEP8 and type errors
   "flake8-pyproject   ~= 1.2.4",   # Flake8 plugin for pyproject.toml
   "bandit             ~= 1.9.4",   # Code linting: security best pra
-  "mypy               >= 1.19.1,< 2.2.0",    # Static type checking
+  "mypy               >= 1.19.1,< 2.4.0",    # Static type checking
   "black              >= 26.3.1,< 26.6.0",  # Formatting rules, auto-apply PEP8
   "types-PyYAML       ~= 6.0",        # Type stubs for PyYAML
 ]
