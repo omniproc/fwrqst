@@ -5,7 +5,7 @@ requires = [
   "pytest                 == 9.1.1",
   "wheel                  == 0.47.0",
   "setuptools             == 83.0.0",
-  "setuptools_scm[toml]   == 10.2.1",
+  "setuptools_scm[toml]   == 10.2.3",
 ]
 build-backend = "setuptools.build_meta"
 
