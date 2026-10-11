@@ -6,9 +6,9 @@
 import json
 
 import pytest
-from conftest import create_access_request_ticket
 from hypothesis import HealthCheck, given, settings
 
+from conftest import create_access_request_ticket
 from fwrqst.io import dump_tickets, export_schema, load_tickets
 
 

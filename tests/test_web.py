@@ -4,9 +4,9 @@
 
 # __IMPORTS____________________________________________________________________________________________________________
 import pytest
-from conftest import create_access_request_ticket
 from hypothesis import HealthCheck, given, settings
 
+from conftest import create_access_request_ticket
 from fwrqst.api.securechange import AccessRequestService
 from fwrqst.models.adapter import AccessRequestTicketAdapter
 from fwrqst.models.ticket import AccessRequestTicket

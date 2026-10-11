@@ -28,9 +28,9 @@ cli = typer.Typer(
 def accessrequest(
     ctx: typer.Context,
     output: Annotated[
-        Path,
+        Path | None,
         typer.Option("--output", "-o", help="Path to an output file.", file_okay=True, dir_okay=False, writable=True),
-    ] = None,  # type: ignore[assignment]
+    ] = None,
 ):
     """
     Get the Tufin SecureChange access request schema.

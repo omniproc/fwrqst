@@ -18,7 +18,7 @@ EXIT_FAILURE = 1
 
 _VALID_DOMAIN = "tufin.example.com"
 _VALID_USERNAME = "testuser"
-_VALID_PASSWORD = "testpass"  # nosec B105
+_VALID_PASSWORD = "testpass"
 _VALID_PORT = "443"
 _VALID_WORKFLOW = "Standard"
 

@@ -11,7 +11,7 @@ and exposes the ``start()`` entry-point called by the console-script.
 """
 
 # __IMPORTS______________________________________________________________________________________________________________
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 
@@ -37,7 +37,7 @@ def _version_callback(value: bool):
 
 def _cli_callback(
     version: Annotated[
-        Optional[bool],
+        bool | None,
         typer.Option(
             "--version",
             "-v",

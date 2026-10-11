@@ -218,7 +218,7 @@ class AccessRequestTicket(BaseModel, title="Access Request Ticket", use_enum_val
     access_requests: Annotated[list[AccessRequest], Field(description="list of access requests", min_length=1)]
 
     @model_validator(mode="after")
-    def validate_expiration(self) -> "AccessRequestTicket":
+    def validate_expiration(self) -> AccessRequestTicket:
         _min_expiration = date.today()
         _max_expiration = _min_expiration + timedelta(days=SETTINGS.get("ACCESS_REQUEST_MAX_EXPIRATION_DAYS", None))
 
