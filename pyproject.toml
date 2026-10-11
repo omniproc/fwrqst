@@ -77,8 +77,9 @@ local_scheme = "no-local-version"
 fallback_version = "0.0.0"
 
 [tool.uv]
-# Minimum uv version required to work with this project's lockfile
-required-version = ">=0.12.19"
+# Minimum uv version for this project's lockfile and dependency groups. Keep this a
+# loose floor rather than the latest release: Dependabot ships its own, slightly older uv.
+required-version = ">=0.12"
 
 [tool.ruff]
 # The target Python version is inferred from `requires-python`
