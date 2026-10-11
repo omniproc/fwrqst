@@ -48,13 +48,22 @@ jobs:
         run: uv run ty check --output-format=github
       - name: Run unit tests
         run: uv run pytest
+      - name: Upload coverage to Codecov
+        if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          # Written by pytest-cov (--cov-report=xml in pyproject.toml)
+          files: coverage.xml
+          disable_search: true
       - name: Upload test results to Codecov
         if: ${{ !cancelled() && github.event_name != 'pull_request' }}
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: junit.xml
-          flags: test-results
+          report_type: test_results
+          disable_search: true
       - name: Build package
         run: uv build
 
