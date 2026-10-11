@@ -1,28 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Resolve venv bin directory (Windows Git Bash: Scripts, POSIX: bin)
-if [ -d ".venv/Scripts" ]; then
-    venv_bin=".venv/Scripts"
-elif [ -d ".venv/bin" ]; then
-    venv_bin=".venv/bin"
-else
-    printf 'ERROR: Virtual environment not found. Run "make install" first.\n' >&2
+if ! command -v uv >/dev/null 2>&1; then
+    printf 'ERROR: uv not found. Install it first: https://docs.astral.sh/uv/getting-started/installation/\n' >&2
     exit 1
 fi
 
-python="${venv_bin}/python"
+# --locked: fail if uv.lock is out of sync with pyproject.toml (run "make lock")
+printf '==> ruff format --check .\n'
+uv run --locked ruff format --check .
 
-if [ ! -f "${python}" ] && [ ! -f "${python}.exe" ]; then
-    printf 'ERROR: Python not found at %s. Run "make install" first.\n' "${python}" >&2
-    exit 1
-fi
+printf '==> ruff check .\n'
+uv run --locked ruff check .
 
-printf '==> black --check .\n'
-"${python}" -m black --check .
-
-printf '==> flake8 .\n'
-"${python}" -m flake8 .
-
-printf '==> mypy src/\n'
-"${python}" -m mypy src/
+printf '==> ty check\n'
+uv run --locked ty check

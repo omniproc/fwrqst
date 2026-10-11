@@ -1,26 +1,15 @@
 .DEFAULT_GOAL := help
 
 # ── Cross-platform detection ──────────────────────────────────────────
-VENV_CFG = .venv/pyvenv.cfg
-
+# uv manages the virtualenv (.venv) and resolves the correct interpreter on
+# every platform, so only the shell differs between Windows and POSIX.
 ifeq ($(OS),Windows_NT)
     SHELL       = cmd.exe
     .SHELLFLAGS = /c
-    VENV_BIN    = .venv\Scripts
-    PYTHON      = $(VENV_BIN)\python
-    PIP         = $(VENV_BIN)\pip
-else
-    VENV_BIN    = .venv/bin
-    PYTHON      = $(VENV_BIN)/python
-    PIP         = $(VENV_BIN)/pip
 endif
 
-# ── Auto-create virtualenv when missing ───────────────────────────────
-$(VENV_CFG):
-	python -m venv .venv
-
 # ── Targets ───────────────────────────────────────────────────────────
-.PHONY: help venv activate install format lint typecheck security test build check clean
+.PHONY: help venv activate install lock format lint typecheck security test build check clean
 
 ifeq ($(OS),Windows_NT)
 help: ## Show available targets
@@ -31,9 +20,10 @@ help:
 		awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 endif
 
-venv: $(VENV_CFG) ## Create virtual environment
+venv: ## Create virtual environment and sync all dependencies
+	uv sync --all-extras
 
-activate: $(VENV_CFG) ## Print venv activation instructions
+activate: ## Print venv activation instructions
 ifeq ($(OS),Windows_NT)
 	@echo. & rem
 	@echo   make cannot activate a virtualenv in your current shell
@@ -43,7 +33,7 @@ ifeq ($(OS),Windows_NT)
 	@echo. & rem
 	@echo     .\.venv\Scripts\Activate.ps1
 	@echo. & rem
-	@echo   All other make targets use the virtualenv automatically.
+	@echo   Activation is optional: "uv run <command>" always uses the venv.
 	@echo. & rem
 else
 	@echo ""
@@ -54,39 +44,44 @@ else
 	@echo ""
 	@echo "    source .venv/bin/activate"
 	@echo ""
-	@echo "  All other make targets use the virtualenv automatically."
+	@echo "  Activation is optional: \"uv run <command>\" always uses the venv."
 	@echo ""
 endif
 
-install: $(VENV_CFG) ## Install all dependencies and git hooks
-	$(PIP) install --upgrade pip
-	$(PIP) install -e ".[all]" build
+install: venv ## Install all dependencies and git hooks
 	git config core.hooksPath .githooks
 
-format: $(VENV_CFG) ## Auto-format code with black
-	$(PYTHON) -m black .
+lock: ## Update uv.lock after changing dependencies in pyproject.toml
+	uv lock
 
-lint: $(VENV_CFG) ## Lint code with flake8
-	$(PYTHON) -m flake8 .
+format: ## Auto-format code and sort imports with ruff
+	uv run ruff check --select I --fix .
+	uv run ruff format .
 
-typecheck: $(VENV_CFG) ## Type-check code with mypy
-	$(PYTHON) -m mypy src/
+lint: ## Check formatting and lint code with ruff
+	uv run ruff format --check .
+	uv run ruff check .
 
-security: $(VENV_CFG) ## Security scan with bandit
-	$(PYTHON) -m bandit -c pyproject.toml -r .
+typecheck: ## Type-check code with ty
+	uv run ty check
 
-test: $(VENV_CFG) ## Run unit tests with coverage
-	$(PYTHON) -m pytest
+security: ## Security scan with ruff (flake8-bandit rules)
+	uv run ruff check --select S .
 
-build: $(VENV_CFG) ## Build sdist and wheel
-	$(PYTHON) -m build
+test: ## Run unit tests with coverage
+	uv run pytest
 
-check: lint typecheck security test ## Run all checks (lint, typecheck, security, test)
+build: ## Build sdist and wheel
+	uv build
+
+check: lint typecheck test ## Run all checks (lint incl. security, typecheck, test)
 
 ifeq ($(OS),Windows_NT)
 clean: ## Remove generated files
-	@powershell -NoProfile -Command "Remove-Item -Recurse -Force .venv, dist, build, .mypy_cache, .pytest_cache -ErrorAction SilentlyContinue"
+	@powershell -NoProfile -Command "Remove-Item -Recurse -Force .venv, dist, build, .ruff_cache, .pytest_cache -ErrorAction SilentlyContinue"
 else
+# In the dev container .venv is a volume mount point: it can only be emptied, not removed
 clean:
-	rm -rf .venv dist build .mypy_cache .pytest_cache
+	rm -rf dist build .ruff_cache .pytest_cache
+	if mountpoint -q .venv 2>/dev/null; then find .venv -mindepth 1 -delete; else rm -rf .venv; fi
 endif
