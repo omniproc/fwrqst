@@ -1,9 +1,10 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2024 Robert Ruf
 # SPDX-License-Identifier: MIT
 
 
 # __IMPORTS____________________________________________________________________________________________________________
+from hypothesis import HealthCheck, given, settings
+
 from conftest import (
     create_access_request_ticket,
     create_dns_endpoint,
@@ -12,13 +13,12 @@ from conftest import (
     create_object_endpoint,
     create_service,
 )
-from hypothesis import HealthCheck, given, settings
-
 from fwrqst.models.adapter import (
     AccessRequestTicketAdapter,
     EndpointAdapter,
     ServiceAdapter,
 )
+from fwrqst.models.ticket import DnsEndpoint, IpEndpoint, IPRangeEndpoint, ObjectEndpoint
 from fwrqst.models.tufin_dto import (
     AccessRequestDto,
     AccessRequestFieldDto,
@@ -58,6 +58,7 @@ def test_ip_endpoint_roundtrip(endpoint):
     """An IP endpoint should survive a domain → DTO → domain round-trip."""
     dto = EndpointAdapter.to_dto(endpoint)
     result = EndpointAdapter.from_dto(dto)
+    assert isinstance(result, IpEndpoint)
     assert result.kind == endpoint.kind
     assert str(result.address) == str(endpoint.address)
     assert result.cidr == endpoint.cidr
@@ -69,6 +70,7 @@ def test_ip_range_endpoint_roundtrip(endpoint):
     """An IP range endpoint should survive a domain → DTO → domain round-trip."""
     dto = EndpointAdapter.to_dto(endpoint)
     result = EndpointAdapter.from_dto(dto)
+    assert isinstance(result, IPRangeEndpoint)
     assert result.kind == endpoint.kind
     assert str(result.start) == str(endpoint.start)
     assert str(result.end) == str(endpoint.end)
@@ -80,6 +82,7 @@ def test_dns_endpoint_roundtrip(endpoint):
     """A DNS endpoint should survive a domain → DTO → domain round-trip."""
     dto = EndpointAdapter.to_dto(endpoint)
     result = EndpointAdapter.from_dto(dto)
+    assert isinstance(result, DnsEndpoint)
     assert result.kind == endpoint.kind
     assert result.fqdn == endpoint.fqdn
 
@@ -90,6 +93,7 @@ def test_object_endpoint_roundtrip(endpoint):
     """A Tufin object endpoint should survive a domain → DTO → domain round-trip."""
     dto = EndpointAdapter.to_dto(endpoint)
     result = EndpointAdapter.from_dto(dto)
+    assert isinstance(result, ObjectEndpoint)
     assert result.kind == endpoint.kind
     assert result.name == endpoint.name
     assert result.manager == endpoint.manager

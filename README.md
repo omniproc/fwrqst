@@ -3,7 +3,7 @@
 ![CI](https://github.com/omniproc/fwrqst/actions/workflows/ci.yml/badge.svg)
 ![Release](https://github.com/omniproc/fwrqst/actions/workflows/release.yml/badge.svg)
 ![Codecov](https://codecov.io/gh/omniproc/fwrqst/branch/main/graph/badge.svg)
-![Python](https://img.shields.io/badge/python-~%3D3.14-blue?logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/python-%3E%3D3.14-blue?logo=python&logoColor=white)
 ![PyPI](https://img.shields.io/pypi/v/fwrqst?logo=pypi&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Conventional Commits](https://img.shields.io/badge/commits-conventional-fe5196?logo=conventionalcommits&logoColor=white)
@@ -33,7 +33,7 @@ When you now create a new file ending `.tufin.yaml` VSCode will automatically us
 
 # CLI usage
 
-Install with CLI extras: `pip install fwrqst[cli]`
+Install with CLI extras: `pip install fwrqst[cli]`, or as an isolated tool with [uv](https://docs.astral.sh/uv/): `uv tool install "fwrqst[cli]"`
 
 ## `securechange` — Tufin SecureChange API
 
@@ -158,64 +158,78 @@ Few things to note here:
 
 # Development
 
+This project uses the [Astral](https://astral.sh/) toolchain:
+
+| Tool                                   | Purpose                                                       |
+| -------------------------------------- | ------------------------------------------------------------- |
+| [uv](https://docs.astral.sh/uv/)       | Python and dependency management, virtualenv, build           |
+| [ruff](https://docs.astral.sh/ruff/)   | Formatting, linting, import sorting, security (bandit) rules  |
+| [ty](https://docs.astral.sh/ty/)       | Static type checking and language server                      |
+
+All tool settings live in `pyproject.toml`. Exact dependency versions are locked in `uv.lock`, which is committed to the repository.
+
 ## Prerequisites
 
-- Python 3.14+
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) — installs the Python version from `.python-version` automatically if it is missing
 - `make` (optional but recommended — on Windows: `winget install GnuWin32.Make` or use Git Bash / WSL)
+
+Alternatively, open the repository in the [dev container](.devcontainer/) which comes with uv, all dependencies and the recommended VS Code extensions preinstalled.
 
 ## Quick start
 
 ```bash
-# Install all dependencies and git hooks (auto-creates the venv)
+# Create the .venv, install all dependencies and git hooks
 make install
 ```
 
-All make targets automatically create the virtual environment if it does not exist yet.
-
 ## Available Make targets
 
-| Target           | Description                                      |
-| ---------------- | ------------------------------------------------ |
-| `make help`      | Show all available targets                       |
-| `make venv`      | Create a `.venv` virtual environment             |
-| `make activate`  | Print venv activation instructions               |
-| `make install`   | Install all dependencies and git hooks           |
-| `make format`    | Auto-format code with black                      |
-| `make lint`      | Lint code with flake8                            |
-| `make typecheck` | Type-check code with mypy                        |
-| `make security`  | Security scan with bandit                        |
-| `make test`      | Run unit tests with coverage                     |
-| `make build`     | Build sdist and wheel                            |
-| `make check`     | Run all checks (lint, typecheck, security, test) |
-| `make clean`     | Remove generated files                           |
+| Target           | Description                                            |
+| ---------------- | ------------------------------------------------------ |
+| `make help`      | Show all available targets                             |
+| `make venv`      | Create `.venv` and sync all dependencies               |
+| `make activate`  | Print venv activation instructions                     |
+| `make install`   | Install all dependencies and git hooks                 |
+| `make lock`      | Update `uv.lock` after changing dependencies           |
+| `make format`    | Auto-format code and sort imports with ruff            |
+| `make lint`      | Check formatting and lint code with ruff               |
+| `make typecheck` | Type-check code with ty                                |
+| `make security`  | Security scan with ruff (flake8-bandit rules)          |
+| `make test`      | Run unit tests with coverage                           |
+| `make build`     | Build sdist and wheel                                  |
+| `make check`     | Run all checks (lint incl. security, typecheck, test)  |
+| `make clean`     | Remove generated files                                 |
 
 ## Manual setup (without Make)
 
 ```bash
-python -m venv .venv
-
-# Activate the venv
-# Linux / macOS:
-source .venv/bin/activate
-# Windows (PowerShell):
-.venv\Scripts\Activate.ps1
-
-# Install dependencies
-pip install --upgrade pip
-pip install -e ".[all]" build
+# Create .venv and install the project with all extras and dev dependencies
+uv sync --all-extras
 
 # Install git hooks
 git config core.hooksPath .githooks
 ```
 
+Activating the venv is optional: `uv run <command>` always runs inside it.
+
+## Managing dependencies
+
+```bash
+uv add <package>                # Add a runtime dependency
+uv add --optional cli <package> # Add a dependency to the [cli] extra
+uv add --group test <package>   # Add a development dependency (groups: lint, test)
+uv lock --upgrade-package <pkg> # Upgrade a single locked dependency
+```
+
+Development dependencies are declared as [dependency groups](https://packaging.python.org/en/latest/specifications/dependency-groups/) and are not part of the published package.
+
 ## Running checks locally
 
 ```bash
-black .                       # Format
-flake8 .                      # Lint
-mypy src/                     # Type check
-bandit -c pyproject.toml -r . # Security
-pytest                        # Tests
+uv run ruff format .   # Format
+uv run ruff check .    # Lint (incl. security rules)
+uv run ty check        # Type check
+uv run pytest          # Tests
 ```
 
 ## VS Code
@@ -227,7 +241,7 @@ The workspace includes debug launch configurations (`.vscode/launch.json`):
 | **Debug: CLI**    | Debug the CLI entry point           |
 | **Debug: Pytest** | Debug tests with breakpoint support |
 
-Recommended extensions are listed in `.vscode/extensions.json` and will be suggested on first open.
+Recommended extensions are listed in `.vscode/extensions.json` and will be suggested on first open. The [Ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff) extension formats and organizes imports on save, the [ty](https://marketplace.visualstudio.com/items?itemName=astral-sh.ty) extension provides type checking and replaces Pylance as language server.
 
 ## Commit convention
 
@@ -247,7 +261,7 @@ docs: update CLI usage examples
 
 ```bash
 make build
-# or: python -m build
+# or: uv build
 ```
 
 # Tufin API documentation

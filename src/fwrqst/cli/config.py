@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2024 Robert Ruf
 # SPDX-License-Identifier: MIT
 
@@ -14,7 +13,6 @@ the Dynaconf-backed settings stored in a platform-specific TOML file.
 from typing import Annotated
 
 import typer
-from click import ParamType
 from dynaconf import ValidationError
 from rich.table import Table
 
@@ -32,7 +30,7 @@ cli = typer.Typer(
 
 # __PROGRAM____________________________________________________________________________________________________________
 class Union:  # pragma: no cover
-    """Wrapper type used by UnionParser to pass raw values through Typer's type system."""
+    """Placeholder type used with parse_union to pass raw values through Typer's type system."""
 
     def __init__(self, value: str):
         self.value = value
@@ -44,8 +42,13 @@ class Union:  # pragma: no cover
         return f"<Union: value={self.value}>"
 
 
-class UnionParser(ParamType):
-    """Click parameter type that coerces string CLI input into ``str | int | bool``.
+# Canonical boolean string literals recognised by parse_union.
+_BOOL_TRUE = "true"
+_BOOL_FALSE = "false"
+
+
+def parse_union(value: str | int | bool | None) -> str | int | bool | None:
+    """Typer parser that coerces string CLI input into ``str | int | bool``.
 
     Parsing rules (applied in order):
         1. Empty / ``None``  → ``None`` (resets the setting to its default).
@@ -54,32 +57,24 @@ class UnionParser(ParamType):
         4. String parseable as ``int`` → ``int``.
         5. Anything else → ``str``.
     """
-
-    name = "MANY"
-
-    # Canonical boolean string literals recognised by this parser.
-    _BOOL_TRUE = "true"
-    _BOOL_FALSE = "false"
-
-    def convert(self, value, param, ctx) -> str | int | bool | None:
-        if not value:
-            # No value given — return None so the setting resets to its default.
-            return None
-        if isinstance(value, bool):
+    if not value:
+        # No value given — return None so the setting resets to its default.
+        return None
+    if isinstance(value, bool):
+        return value
+    elif isinstance(value, int):
+        return value
+    elif isinstance(value, str):
+        if value.lower() == _BOOL_TRUE:
+            return True
+        elif value.lower() == _BOOL_FALSE:
+            return False
+        try:
+            return int(value)
+        except ValueError:
             return value
-        elif isinstance(value, int):
-            return value
-        elif isinstance(value, str):
-            if value.lower() == self._BOOL_TRUE:
-                return True
-            elif value.lower() == self._BOOL_FALSE:
-                return False
-            try:
-                return int(value)
-            except ValueError:
-                return value
-        else:
-            self.fail(f"{value!r} ({type(value).__name__}) is not a valid input type", param, ctx)
+    else:
+        raise typer.BadParameter(f"{value!r} ({type(value).__name__}) is not a valid input type")
 
 
 @cli.command()
@@ -120,16 +115,16 @@ def set(
     key: Annotated[
         str,
         typer.Option("--key", "-k", help="Setting to configure."),
-    ] = None,  # type: ignore[assignment]
+    ],
     value: Annotated[
-        Union,
+        Union | None,
         typer.Option(
             "--value",
             "-v",
             help="Value of the setting. Empty sets default.",
-            click_type=UnionParser(),
+            parser=parse_union,
         ),
-    ] = None,  # type: ignore[assignment]
+    ] = None,
 ):
     """
     Set and persist a setting to disk.

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2024 Robert Ruf
 # SPDX-License-Identifier: MIT
 
@@ -35,7 +34,7 @@ def _make_sslctx():
 
 def _make_auth():
     """Create a dummy BasicAuth credential for unit tests."""
-    return BasicAuth(username="user", password="pass")  # nosec B106
+    return BasicAuth(username="user", password="pass")
 
 
 # __PROGRAM____________________________________________________________________________________________________________

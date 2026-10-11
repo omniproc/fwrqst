@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2024 Robert Ruf
 # SPDX-License-Identifier: MIT
 
@@ -43,7 +42,7 @@ def read_yaml(path: Path) -> dict:
     """
     Read a YAML file and return its contents as a dict.
     """
-    with open(path, "r") as file:
+    with open(path) as file:
         data: dict = yaml.safe_load(file)
     return data
 

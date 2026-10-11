@@ -1,16 +1,17 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2024 Robert Ruf
 # SPDX-License-Identifier: MIT
 
 
 # __IMPORTS____________________________________________________________________________________________________________
 import pytest
+import typer
 from hypothesis import HealthCheck, given
 from hypothesis import settings as hsettings
 from hypothesis import strategies as st
 from typer.testing import CliRunner
 
 from fwrqst import __program__
+from fwrqst.cli.config import parse_union
 from fwrqst.cli.main import cli
 from fwrqst.models.types import Priority
 from fwrqst.settings import (
@@ -59,7 +60,7 @@ def test_set_invalid_key(mocker):
     assert result.exit_code == EXIT_FAILURE
 
 
-# Strategy for strings that won't be parsed as numbers or booleans by UnionParser
+# Strategy for strings that won't be parsed as numbers or booleans by parse_union
 _cli_safe_text = st.text(
     alphabet=st.characters(codec="utf-8", categories=("L",)),
     min_size=1,
@@ -116,23 +117,23 @@ def test_set_expiration_days(days, mocker):
 
 
 def test_set_boolean_true(mocker):
-    """UnionParser should parse 'true' string as boolean True."""
+    """parse_union should parse 'true' string as boolean True."""
     mocker.patch("fwrqst.settings.persist")
-    # ACCESS_REQUEST_SUBJECT expects a string, but UnionParser converts "true" -> True (bool).
+    # ACCESS_REQUEST_SUBJECT expects a string, but parse_union converts "true" -> True (bool).
     # Dynaconf should reject a bool for a string-typed setting.
     result = runner.invoke(cli, ["config", "set", "-k", KEY_ACCESS_REQUEST_SUBJECT, "-v", "true"])
     assert result.exit_code == EXIT_FAILURE
 
 
 def test_set_boolean_false(mocker):
-    """UnionParser should parse 'false' string as boolean False."""
+    """parse_union should parse 'false' string as boolean False."""
     mocker.patch("fwrqst.settings.persist")
     result = runner.invoke(cli, ["config", "set", "-k", KEY_ACCESS_REQUEST_SUBJECT, "-v", "false"])
     assert result.exit_code == EXIT_FAILURE
 
 
 def test_set_integer_value_for_int_key(mocker):
-    """UnionParser should parse numeric string as int; valid for int-typed keys."""
+    """parse_union should parse numeric string as int; valid for int-typed keys."""
     mocker.patch("fwrqst.settings.persist")
     result = runner.invoke(cli, ["config", "set", "-k", KEY_SECURE_CHANGE_PORT, "-v", "8080"])
     assert result.exit_code == EXIT_SUCCESS
@@ -157,31 +158,26 @@ def test_start_exception_handling(mocker):
     assert exc_info.value.exit_code == 1
 
 
-# __UnionParser direct tests_______________________________________________________________________________________________
-class TestUnionParser:
-    """Direct tests for UnionParser.convert() branches."""
-
-    def setup_method(self):
-        from fwrqst.cli.config import UnionParser
-
-        self.parser = UnionParser()
+# __parse_union direct tests______________________________________________________________________________________________
+class TestParseUnion:
+    """Direct tests for parse_union() branches."""
 
     def test_none_value_returns_none(self):
-        assert self.parser.convert(None, None, None) is None
+        assert parse_union(None) is None
 
     def test_empty_string_returns_none(self):
-        assert self.parser.convert("", None, None) is None
+        assert parse_union("") is None
 
     def test_bool_passthrough(self):
-        assert self.parser.convert(True, None, None) is True
-        assert self.parser.convert(False, None, None) is None  # False is falsy → returns None
+        assert parse_union(True) is True
+        assert parse_union(False) is None  # False is falsy → returns None
 
     def test_int_passthrough(self):
-        assert self.parser.convert(42, None, None) == 42
+        assert parse_union(42) == 42
 
     def test_unsupported_type_fails(self):
-        with pytest.raises(Exception):
-            self.parser.convert(3.14, None, None)
+        with pytest.raises(typer.BadParameter):
+            parse_union(3.14)  # ty: ignore[invalid-argument-type]
 
 
 # __show/find error paths__________________________________________________________________________________________________

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2024 Robert Ruf
 # SPDX-License-Identifier: MIT
 
@@ -77,7 +76,7 @@ class IpRangeEndpointDto(EndpointDto, populate_by_name=True, use_enum_values=Tru
     end: Annotated[str, Field(alias="range_last_ip")]
 
     @model_validator(mode="after")
-    def validate_range(self) -> "IpRangeEndpointDto":
+    def validate_range(self) -> IpRangeEndpointDto:
         """Validate range of IP addresses."""
 
         first_ip = self.start

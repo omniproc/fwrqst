@@ -1,11 +1,7 @@
 [build-system]
 requires = [
-  "build                  == 1.6.1",
-  "pip                    == 26.2.1",
-  "pytest                 == 9.1.1",
-  "wheel                  == 0.48.0",
   "setuptools             == 84.0.0",
-  "setuptools_scm[toml]   == 10.3.4",
+  "setuptools-scm         == 10.3.4",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -14,7 +10,7 @@ name = "fwrqst"
 dynamic = ['version']
 description = "Lib for interacting with the Tufin API"
 readme = "README.md"
-requires-python = "~=3.14"
+requires-python = ">=3.14"
 keywords = ["python", "firewall", "tufin"]
 license = { file = "LICENSE" }
 authors = [{ name = "Robert Ruf", email = "fwrqst.hvgh7@silomails.com" }]
@@ -31,13 +27,14 @@ dependencies = [
 cli = [
   "typer              == 0.27.2", # CLI framework
 ]
-dev = [
-  "flake8             >= 7.3,< 7.5",   # Code linting, PEP8 and type errors
-  "flake8-pyproject   ~= 1.2.4",   # Flake8 plugin for pyproject.toml
-  "bandit             ~= 1.9.4",   # Code linting: security best pra
-  "mypy               >= 1.19.1,< 2.5.0",    # Static type checking
-  "black              >= 26.3.1,< 26.6.0",  # Formatting rules, auto-apply PEP8
-  "types-PyYAML       ~= 6.0",        # Type stubs for PyYAML
+
+[dependency-groups]
+# PEP 735 dependency groups: development-only, never published as package extras.
+# `uv sync` installs the `dev` group by default.
+lint = [
+  "ruff               == 0.16.9",  # Linting (incl. bandit security rules) and formatting
+  "ty                 == 0.0.84",  # Static type checking
+  "types-PyYAML       ~= 6.0",     # Type stubs for PyYAML
 ]
 test = [
   "pytest             == 9.1.1",   # Unittests
@@ -46,7 +43,10 @@ test = [
   "pytest-httpx       == 0.36.2",  # HTTPX mocking
   "hypothesis         == 6.168.3", # Property-based testing
 ]
-all = ["fwrqst[cli,dev,test]"]
+dev = [
+  { include-group = "lint" },
+  { include-group = "test" },
+]
 
 [project.urls]
 git = "https://github.com/omniproc/fwrqst/"
@@ -72,42 +72,46 @@ version_scheme = "python-simplified-semver"
 # Omit the local part of the version number (pypi doesn't support local versions)
 local_scheme = "no-local-version"
 # Fallback used when neither git metadata nor PKG-INFO from an sdist is available
-# (e.g. shallow CI checkouts, GitHub source tarballs). Keeps `python -m build`'s
+# (e.g. shallow CI checkouts, GitHub source tarballs). Keeps `uv build`'s
 # wheel-from-sdist step working even when setuptools_scm cannot detect a version.
 fallback_version = "0.0.0"
 
-[tool.bandit]
-exclude_dirs = [".venv", ".vscode", "build", "dist", "examples", "debug"]
-# See https://bandit.readthedocs.io/en/latest/plugins/index.html
-skips = ["B201", "B601", "B610", "B611"]
+[tool.uv]
+# Minimum uv version required to work with this project's lockfile
+required-version = ">=0.12.19"
 
-[tool.bandit.assert_used]
-# Skipp assert warnings for test files
-skips = ['*_test.py', '*/test_*.py']
-
-[tool.black]
+[tool.ruff]
+# The target Python version is inferred from `requires-python`
 line-length = 127
+src = ["src", "tests"]
+extend-exclude = ["examples", "debug"]
 
-[tool.mypy]
-python_version = "3.14"
-warn_return_any = true
-warn_unused_configs = true
-ignore_missing_imports = true
-check_untyped_defs = true
-exclude = ["build", "dist", ".venv"]
-
-[tool.flake8]
-# See https://flake8.pycqa.org/en/latest/user/violations.html
-# See https://flake8.pycqa.org/en/latest/user/error-codes.html
-# See https://pycodestyle.pycqa.org/en/latest/intro.html#error-codes
-select = ["F", "E", "W"]
-ignore = [
-  "F405", # name may be undefined, or defined from star imports: module
-  "F403", # 'from module import *' used; unable to detect undefined names
-  "E501", # line too long
+[tool.ruff.lint]
+# See https://docs.astral.sh/ruff/rules/
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "UP",  # pyupgrade
+  "B",   # flake8-bugbear
+  "S",   # flake8-bandit (replaces bandit)
 ]
-per-file-ignores = ['__init__.py:F401']
-max-line-length = 127
-exclude = [".venv", ".vscode", "build", "dist", "examples"]
-count = true
-statistics = true
+ignore = [
+  "E501", # line too long (handled by the formatter)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+# typer.Exit / SystemExit are control-flow signals; exception chaining adds nothing
+"src/fwrqst/cli/**" = ["B904"]
+# assert is the idiomatic pytest check; tests use dummy credentials
+"tests/**" = ["S101", "S105", "S106"]
+
+[tool.ty.environment]
+# The target Python version is inferred from `requires-python`.
+# Pin the project venv so the language server does not follow the editor's selected interpreter.
+python = "./.venv"
+
+[tool.ty.src]
+include = ["src", "tests"]

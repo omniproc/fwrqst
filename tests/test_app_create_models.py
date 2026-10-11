@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2024 Robert Ruf
 # SPDX-License-Identifier: MIT
 
@@ -6,8 +5,9 @@
 # __IMPORTS____________________________________________________________________________________________________________
 from datetime import date, timedelta
 
-from conftest import create_access_request, create_access_request_ticket
 from hypothesis import HealthCheck, given, settings
+
+from conftest import create_access_request, create_access_request_ticket
 
 
 # __PROGRAM____________________________________________________________________________________________________________

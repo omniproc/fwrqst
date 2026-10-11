@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2024 Robert Ruf
 # SPDX-License-Identifier: MIT
 
@@ -14,7 +13,7 @@ Typer context object.
 # __IMPORTS______________________________________________________________________________________________________________
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from httpx import HTTPStatusError, RequestError
@@ -33,7 +32,7 @@ from fwrqst.settings import (
 
 # --- Environment variable names exposed to the shell -----------------------------------
 _ENV_USERNAME = "FWRQST_SECURE_CHANGE_USERNAME"
-_ENV_PASSWORD = "FWRQST_SECURE_CHANGE_PASSWORD"  # nosec B105
+_ENV_PASSWORD = "FWRQST_SECURE_CHANGE_PASSWORD"  # noqa: S105
 _ENV_DOMAIN = "FWRQST_SECURE_CHANGE_DOMAIN"
 _ENV_PORT = "FWRQST_SECURE_CHANGE_PORT"
 _ENV_CA_FILE = "FWRQST_SECURE_CHANGE_CA_FILE"
@@ -91,7 +90,7 @@ def _handle_api_errors(operation: str):
 def securechange_callback(
     ctx: typer.Context,
     username: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(
             "-u",
             "--username",
@@ -100,7 +99,7 @@ def securechange_callback(
         ),
     ],
     password: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(
             "-p",
             "--password",
@@ -112,7 +111,7 @@ def securechange_callback(
         ),
     ],
     domain: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(
             "-d",
             "--domain",
@@ -122,7 +121,7 @@ def securechange_callback(
         ),
     ] = SETTINGS.get(KEY_SECURE_CHANGE_DOMAIN, None),
     port: Annotated[
-        Optional[int],
+        int | None,
         typer.Option(
             "--port",
             callback=_fallback_to_default,
@@ -131,7 +130,7 @@ def securechange_callback(
         ),
     ] = SETTINGS.get(KEY_SECURE_CHANGE_PORT, None),
     cafile: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Option(
             "-c",
             "--cafile",
@@ -143,7 +142,7 @@ def securechange_callback(
         ),
     ] = None,
     workflow: Annotated[
-        Optional[str],
+        str | None,
         typer.Option(
             "--workflow",
             callback=_fallback_to_default,
@@ -211,7 +210,7 @@ def read(
     ctx: typer.Context,
     ticket_id: Annotated[str, typer.Argument(help="The Tufin access request ID.")],
     output: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Option(help="Path to an output file.", file_okay=True, dir_okay=False, writable=True),
     ] = None,
 ):
