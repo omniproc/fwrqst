@@ -1,6 +1,38 @@
 {
-    "name": "FwRqst",
-    "dockerComposeFile": "docker-compose.yaml",
-    "service": "devenv",
-    "workspaceFolder": "/workspace"
+  "name": "FwRqst",
+  // Plain image build instead of a Docker Compose service: Compose v5 builds through Bake,
+  // which refuses to read the Dockerfile that the Dev Containers CLI generates outside the
+  // build context ("additional privileges requested: pass --allow=fs.read=...").
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "runArgs": ["--name", "fwrqst"],
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "workspaceFolder": "/workspace",
+  "containerEnv": {
+    // The uv cache and the bind-mounted workspace live on different filesystems,
+    // so hardlinking is not possible. Copy explicitly to avoid warnings.
+    "UV_LINK_MODE": "copy"
+  },
+  // Keep the container's Linux .venv in a volume, separate from the .venv uv creates on the
+  // host; otherwise uv would replace one with the other whenever it runs on the other side.
+  "mounts": ["source=fwrqst-venv,target=/workspace/.venv,type=volume"],
+  "remoteUser": "vscode",
+  // A new volume is owned by root. The named volume outlives rebuilds, so clear it to start
+  // every container with a fresh .venv. Then sync it from uv.lock and install the git hooks
+  "postCreateCommand": "sudo chown vscode:vscode /workspace/.venv && uv venv --clear && make install",
+  "customizations": {
+    "vscode": {
+      // Keep in sync with .vscode/extensions.json
+      "extensions": [
+        "ms-python.python",
+        "ms-python.debugpy",
+        "charliermarsh.ruff",
+        "astral-sh.ty"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/workspace/.venv/bin/python"
+      }
+    }
+  }
 }
