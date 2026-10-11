@@ -1,5 +1,6 @@
-# Auto-detect text files and normalise line endings on commit
-* text=auto
+# Auto-detect text files, store them with LF and check them out with LF on every platform
+# (independent of core.autocrlf)
+* text=auto eol=lf
 
 # Force LF line endings for shell scripts (required by bash)
 *.sh      text eol=lf
