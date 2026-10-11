@@ -56,7 +56,7 @@ pypi = "https://pypi.org/project/fwrqst/"
 fwrqst = "fwrqst.cli.main:start"
 
 [tool.pytest.ini_options]
-addopts = "-ra --cov=fwrqst --cov-report=term-missing --junitxml=junit.xml" # Add -q for less verbose output
+addopts = "-ra --cov=fwrqst --cov-report=term-missing --cov-report=xml --junitxml=junit.xml" # Add -q for less verbose output
 testpaths = ["tests"]
 
 [tool.setuptools]
