@@ -32,7 +32,7 @@ cli = [
 # PEP 735 dependency groups: development-only, never published as package extras.
 # `uv sync` installs the `dev` group by default.
 lint = [
-  "ruff               == 0.16.9",  # Linting (incl. bandit security rules) and formatting
+  "ruff==0.16.10",  # Linting (incl. bandit security rules) and formatting
   "ty                 == 0.0.84",  # Static type checking
   "types-PyYAML       ~= 6.0",     # Type stubs for PyYAML
 ]
