@@ -20,7 +20,7 @@ dependencies = [
   "httpx              == 0.28.1", # HTTP client
   "pydantic           == 2.13.5", # Data validation and management
   "dynaconf           == 3.3.5", # Settings management
-  "platformdirs       == 4.12.2",  # Cross-platform directories
+  "platformdirs==4.13.3",  # Cross-platform directories
 ]
 
 [project.optional-dependencies]
