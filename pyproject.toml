@@ -39,9 +39,9 @@ lint = [
 test = [
   "pytest             == 9.1.1",   # Unittests
   "pytest-cov         == 7.1.0",   # Coverage
-  "pytest-mock        == 3.16.0",  # Mocking
+  "pytest-mock==3.17.0",  # Mocking
   "pytest-httpx       == 0.36.2",  # HTTPX mocking
-  "hypothesis         == 6.168.3", # Property-based testing
+  "hypothesis==6.170.8", # Property-based testing
 ]
 dev = [
   { include-group = "lint" },
