@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-  "setuptools             == 84.0.0",
+  "setuptools==84.2.1",
   "setuptools-scm         == 10.3.4",
 ]
 build-backend = "setuptools.build_meta"
@@ -18,30 +18,30 @@ authors = [{ name = "Robert Ruf", email = "fwrqst.hvgh7@silomails.com" }]
 dependencies = [
   "pyyaml             == 6.0.3",  # YAML parser
   "httpx              == 0.28.1", # HTTP client
-  "pydantic           == 2.13.5", # Data validation and management
+  "pydantic==2.14.1", # Data validation and management
   "dynaconf           == 3.3.5", # Settings management
   "platformdirs==4.13.5",  # Cross-platform directories
 ]
 
 [project.optional-dependencies]
 cli = [
-  "typer              == 0.27.2", # CLI framework
+  "typer==0.27.3", # CLI framework
 ]
 
 [dependency-groups]
 # PEP 735 dependency groups: development-only, never published as package extras.
 # `uv sync` installs the `dev` group by default.
 lint = [
-  "ruff               == 0.16.9",  # Linting (incl. bandit security rules) and formatting
+  "ruff==0.16.10",  # Linting (incl. bandit security rules) and formatting
   "ty                 == 0.0.84",  # Static type checking
   "types-PyYAML       ~= 6.0",     # Type stubs for PyYAML
 ]
 test = [
   "pytest             == 9.1.1",   # Unittests
   "pytest-cov         == 7.1.0",   # Coverage
-  "pytest-mock        == 3.16.0",  # Mocking
+  "pytest-mock==3.17.0",  # Mocking
   "pytest-httpx       == 0.36.2",  # HTTPX mocking
-  "hypothesis         == 6.168.3", # Property-based testing
+  "hypothesis==6.170.8", # Property-based testing
 ]
 dev = [
   { include-group = "lint" },
