@@ -37,11 +37,11 @@ lint = [
   "types-PyYAML       ~= 6.0",     # Type stubs for PyYAML
 ]
 test = [
-  "pytest             == 9.1.1",   # Unittests
+  "pytest==9.2.0",   # Unittests
   "pytest-cov         == 7.1.0",   # Coverage
   "pytest-mock==3.17.0",  # Mocking
   "pytest-httpx       == 0.36.2",  # HTTPX mocking
-  "hypothesis==6.170.8", # Property-based testing
+  "hypothesis==6.170.13", # Property-based testing
 ]
 dev = [
   { include-group = "lint" },
